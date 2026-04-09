@@ -111,6 +111,10 @@ h2{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spa
       <div class="demo-user-info"><strong>carol@company.com</strong> / Carol123! &nbsp;·&nbsp; Employee</div>
       <button class="demo-fill" onclick="fillDemo('carol@company.com','Carol123!')">Fill</button>
     </div>
+    <div class="demo-user">
+      <div class="demo-user-info"><strong>alice@company.com</strong> / Alice123! &nbsp;·&nbsp; Manager</div>
+      <button class="demo-fill" onclick="fillDemo('alice@company.com','Alice123!')">Fill</button>
+    </div>
   </div>
 </div>
 
@@ -146,6 +150,7 @@ async function initAuth() {
     users: [
       { id: 1, email: 'admin@company.com', passwordHash: await sha256('Admin123!'), name: 'Admin User', role: 'admin', memberId: null },
       { id: 2, email: 'carol@company.com', passwordHash: await sha256('Carol123!'), name: 'Carol Davis', role: 'employee', memberId: 3 },
+      { id: 3, email: 'alice@company.com', passwordHash: await sha256('Alice123!'), name: 'Alice Johnson', role: 'manager', memberId: 1 },
     ],
   };
   saveAuth(auth);
@@ -189,7 +194,7 @@ async function handleSignin() {
   createSession(user);
   showPanel('success');
   document.getElementById('demoPanel').style.display = 'none';
-  setTimeout(() => { window.location.replace(user.role === 'admin' ? 'admin.html' : 'user.html'); }, 1000);
+  setTimeout(() => { window.location.replace((user.role === 'admin' || user.role === 'manager') ? 'admin.html' : 'user.html'); }, 1000);
 }
 
 // ════════════════════════════════════════════════════
@@ -229,7 +234,7 @@ document.getElementById('emailInput').addEventListener('keydown', e => { if (e.k
   try {
     const sess = JSON.parse(sessionStorage.getItem(SESS_KEY) || 'null');
     if (sess && sess.expires > Date.now()) {
-      window.location.replace(sess.role === 'admin' ? 'admin.html' : 'user.html');
+      window.location.replace((sess.role === 'admin' || sess.role === 'manager') ? 'admin.html' : 'user.html');
       return;
     }
   } catch {}

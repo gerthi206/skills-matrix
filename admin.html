@@ -407,6 +407,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .dept-card:hover{border-color:var(--primary);box-shadow:0 4px 16px rgba(37,99,235,.12);transform:translateY(-1px)}
 .dept-card-edit{position:absolute;top:12px;right:12px;color:var(--subtle);opacity:.6}
 .dept-card-edit:hover{opacity:1;color:var(--primary)}
+
+/* Manager scope — hide admin-only elements */
+.is-manager .admin-only { display: none !important; }
 </style>
 </head>
 <body>
@@ -459,7 +462,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       </div>
     </div>
     <div class="modal-ftr" style="gap:10px">
-      <button class="btn btn-danger btn-sm" id="roleDeleteBtn" onclick="deleteRole()" style="display:none">Delete Role</button>
+      <button class="btn btn-danger btn-sm admin-only" id="roleDeleteBtn" onclick="deleteRole()" style="display:none">Delete Role</button>
       <div style="flex:1"></div>
       <button class="btn btn-secondary" onclick="closeRoleModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveRole()">
@@ -489,6 +492,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         <div class="ff"><label>Department</label>
           <select class="fs" id="nm-deptId"><option value="">Select department…</option></select>
         </div>
+      </div>
+      <div class="ff">
+        <label>Reports To</label>
+        <select class="fs" id="nm-managerId">
+          <option value="">No manager</option>
+        </select>
       </div>
       <!-- Invite preview -->
       <div style="background:#f8fafc;border:1.5px solid var(--border);border-radius:10px;padding:14px;font-size:13px">
@@ -541,6 +550,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
           <select class="fs" id="em-deptId"><option value="">No department</option></select>
         </div>
       </div>
+      <div class="ff admin-only" id="em-accountRoleRow">
+        <label>Account Access</label>
+        <select class="fs" id="em-accountRole">
+          <option value="">No Login Access</option>
+          <option value="employee">Employee</option>
+          <option value="manager">Manager</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div class="ff">
+        <label>Reports To</label>
+        <select class="fs" id="em-managerId">
+          <option value="">No manager</option>
+        </select>
+      </div>
       <div class="ff">
         <label>Avatar Color</label>
         <div class="color-swatches" id="em-colorSwatches"></div>
@@ -548,7 +572,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     </div>
     <div class="modal-ftr" style="gap:8px">
       <button class="btn btn-secondary" onclick="closeEditMember()">Cancel</button>
-      <button class="btn btn-danger btn-sm" onclick="deleteMember(_editMemberId)">Delete Member</button>
+      <button class="btn btn-danger btn-sm admin-only" onclick="deleteMember(_editMemberId)">Delete Member</button>
       <button class="btn btn-secondary btn-sm" onclick="resetMemberPassword(_editMemberId)">Reset Password</button>
       <button class="btn btn-primary" onclick="saveEditMember()">Save</button>
     </div>
@@ -571,7 +595,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     </div>
     <div class="modal-ftr" style="gap:8px">
       <button class="btn btn-secondary" onclick="closeDeptModal()">Cancel</button>
-      <button class="btn btn-danger btn-sm" id="deptDeleteBtn" style="display:none" onclick="deleteDept(_editDeptId)">Delete Department</button>
+      <button class="btn btn-danger btn-sm admin-only" id="deptDeleteBtn" style="display:none" onclick="deleteDept(_editDeptId)">Delete Department</button>
       <div style="flex:1"></div>
       <button class="btn btn-primary" onclick="saveDept()">Save Department</button>
     </div>
@@ -598,7 +622,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
       Roles
     </div>
-    <div class="nav-item" data-tab="depts" onclick="navTo('depts',this)">
+    <div class="nav-item admin-only" data-tab="depts" onclick="navTo('depts',this)">
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Departments
     </div>
@@ -621,7 +645,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       Reports
     </div>
     <div class="nav-section">Config</div>
-    <div class="nav-item" data-tab="settings" onclick="navTo('settings',this)">
+    <div class="nav-item admin-only" data-tab="settings" onclick="navTo('settings',this)">
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       Settings
     </div>
@@ -676,7 +700,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <div class="page-header">
         <div class="page-header-text"><h2>People</h2><p>Manage team members and view individual dashboards</p></div>
         <div class="page-header-actions">
-          <button class="btn btn-primary" onclick="openAddMember()">
+          <button class="btn btn-primary admin-only" onclick="openAddMember()">
             <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
             Add Member
           </button>
@@ -695,7 +719,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <div class="page-header">
         <div class="page-header-text"><h2>Roles</h2><p>Define skill targets for each role in your organisation</p></div>
         <div class="page-header-actions">
-          <button class="btn btn-primary" onclick="openAddRole()">
+          <button class="btn btn-primary admin-only" onclick="openAddRole()">
             <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
             Add Role
           </button>
@@ -709,7 +733,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <div class="page-header">
         <div class="page-header-text"><h2>Departments</h2><p>Manage your organisation's departments</p></div>
         <div class="page-header-actions">
-          <button class="btn btn-primary" onclick="openAddDept()">
+          <button class="btn btn-primary admin-only" onclick="openAddDept()">
             <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
             Add Department
           </button>
@@ -773,7 +797,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
           </select>
         </div>
         <div class="ff"><label>Description</label><input class="fi" id="ns-desc" placeholder="Brief description…" style="width:220px"/></div>
-        <button class="btn btn-primary" onclick="addSkill()">
+        <button class="btn btn-primary admin-only" onclick="addSkill()">
           <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
           Add Skill
         </button>
@@ -868,7 +892,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       </div>
       <div class="settings-block">
         <h3>Data</h3>
-        <div class="setting-row"><div class="sr-info"><div class="sr-label">Reset to sample data</div><div class="sr-desc">Restore all demo data — cannot be undone</div></div><button class="btn btn-danger" onclick="resetData()">Reset Data</button></div>
+        <div class="setting-row"><div class="sr-info"><div class="sr-label">Reset to sample data</div><div class="sr-desc">Restore all demo data — cannot be undone</div></div><button class="btn btn-danger admin-only" onclick="resetData()">Reset Data</button></div>
       </div>
     </div>
 
@@ -954,6 +978,13 @@ function saveData(){localStorage.setItem(SK,JSON.stringify(D));}
 function resetToDefault(){D=JSON.parse(JSON.stringify(DEF));saveData();}
 function resetData(){if(confirm('Reset all data to sample defaults?')){resetToDefault();location.reload();}}
 
+function scopedMembers() {
+  const sess = getSession();
+  if (!sess || sess.role === 'admin') return D.members;
+  // Manager sees direct reports + themselves
+  return D.members.filter(m => m.managerId === sess.memberId || m.id === sess.memberId);
+}
+
 // ═══════════════════════════════════════════════════
 // LEVEL CONFIG
 // ═══════════════════════════════════════════════════
@@ -1016,7 +1047,7 @@ function navTo(tab,el){
 // DASHBOARD
 // ═══════════════════════════════════════════════════
 function renderDashboard(){
-  const members=D.members,skills=D.skills;
+  const members=scopedMembers(),skills=D.skills;
   let assessed=0,meetReq=0,totalLv=0,withGaps=0;
   const total=members.length*skills.length;
   for(const m of members){
@@ -1097,7 +1128,7 @@ function donutChart(pct,color,size=90,strokeW=9){
 // ═══════════════════════════════════════════════════
 function renderPeople(){
   const search=(document.getElementById('searchInput')?.value||'').toLowerCase();
-  const members=D.members.filter(m=>!search||m.name.toLowerCase().includes(search)||getMemberRole(m)?.name.toLowerCase().includes(search));
+  const members=scopedMembers().filter(m=>!search||m.name.toLowerCase().includes(search)||getMemberRole(m)?.name.toLowerCase().includes(search));
   document.getElementById('peopleGrid').innerHTML=members.map(m=>{
     const role=getMemberRole(m),dept=getMemberDept(m);
     const skills=D.skills;
@@ -1125,7 +1156,7 @@ function renderPeople(){
         <div class="pc-stat"><div class="pc-stat-val" style="color:#16a34a">${atTarget}</div><div class="pc-stat-lbl">At Target</div></div>
         <div class="pc-stat"><div class="pc-stat-val" style="color:${gaps>0?'#dc2626':'#16a34a'}">${gaps}</div><div class="pc-stat-lbl">Gaps</div></div>
       </div>
-      <div class="pc-actions">
+      <div class="pc-actions admin-only">
         <button class="pc-action-btn" title="Edit member" onclick="event.stopPropagation();openEditMember(${m.id})">
           <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         </button>
@@ -1512,6 +1543,14 @@ function openEditMember(id){
     '<option value="">No department</option>' +
     D.departments.map(d=>`<option value="${d.id}"${m.deptId===d.id?' selected':''}>${h(d.name)}</option>`).join('');
   _buildMemberColorSwatches('em-colorSwatches', _editMemberColor, 'selectMemberColor');
+  // Populate Reports To
+  document.getElementById('em-managerId').innerHTML =
+    '<option value="">No manager</option>' +
+    D.members.filter(x => x.id !== id).map(x => `<option value="${x.id}"${m.managerId===x.id?' selected':''}>${h(x.name)}</option>`).join('');
+  // Populate Account Role from sbAuthData
+  const auth = JSON.parse(localStorage.getItem('sbAuthData')||'null');
+  const authUser = auth?.users?.find(u => u.memberId === id);
+  document.getElementById('em-accountRole').value = authUser?.role || '';
   document.getElementById('editMemberModal').classList.add('open');
   setTimeout(()=>document.getElementById('em-name').focus(), 100);
 }
@@ -1537,12 +1576,17 @@ function saveEditMember(){
   const initials = name.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
   m.name = name; m.email = email; m.roleId = roleId; m.deptId = deptId;
   m.initials = initials; m.color = _editMemberColor;
+  m.managerId = parseInt(document.getElementById('em-managerId').value) || null;
   // Update auth store
   try {
+    const newRole = document.getElementById('em-accountRole').value;
     const auth = JSON.parse(localStorage.getItem('sbAuthData')||'null');
     if(auth && auth.users){
       const u = auth.users.find(x=>x.memberId===_editMemberId || x.email===m.email);
       if(u){ u.name = name; u.email = email; }
+      const idx = auth.users.findIndex(u => u.memberId === m.id);
+      if (idx >= 0 && newRole) auth.users[idx].role = newRole;
+      else if (idx >= 0 && !newRole) {} // leave role unchanged if blank selected
       localStorage.setItem('sbAuthData', JSON.stringify(auth));
     }
   } catch(e){ console.warn('Could not update auth store:', e); }
@@ -1750,7 +1794,7 @@ function renderMatrix(){
   }
   html+='</tr></thead><tbody>';
 
-  for(const m of D.members){
+  for(const m of scopedMembers()){
     const role=getMemberRole(m);
     const hasGap=skills.some(s=>{const tgt=getRoleTarget(m,s.id)||s.required;return tgt&&getLevel(m.id,s.id)<tgt;});
     const matchDept=!deptId||String(m.deptId)===String(deptId);
@@ -1775,7 +1819,7 @@ function renderMatrix(){
   if(showAvg){
     html+='<tr class="avg-row"><td class="td-member"><div class="mem-wrap"><div class="mem-av" style="background:#6366f1;font-size:16px">≈</div><div><div class="mem-name">Team Average</div><div class="mem-role"><span class="avg-badge">AVG</span></div></div></div></td>';
     for(const s of skills){
-      const vals=D.members.map(m=>getLevel(m.id,s.id));
+      const vals=scopedMembers().map(m=>getLevel(m.id,s.id));
       const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
       html+=`<td class="td-cell"><div class="avg-cell lv${Math.round(avg)}" onmouseenter="showAvgTT(event,${s.id},${avg})" onmouseleave="hideTT()">${avg.toFixed(1)}</div></td>`;
     }
@@ -1787,7 +1831,7 @@ function renderMatrix(){
 }
 
 function renderSummaryBar(skills){
-  const members=D.members;
+  const members=scopedMembers();
   let assessed=0,meetReq=0,totalLv=0,withGaps=0;
   const total=members.length*skills.length;
   for(const m of members){
@@ -1907,7 +1951,7 @@ function deleteSkill(id){
 // GAP ANALYSIS
 // ═══════════════════════════════════════════════════
 function renderGaps(){
-  const members=D.members,skills=D.skills;
+  const members=scopedMembers(),skills=D.skills;
   // Gaps by skill
   const skillGaps=skills.map(s=>({s,gaps:members.filter(m=>{const tgt=getRoleTarget(m,s.id)||s.required;return tgt&&getLevel(m.id,s.id)<tgt;}).length})).sort((a,b)=>b.gaps-a.gaps);
   document.getElementById('gapBySkill').innerHTML=`<div class="chart-row">${skillGaps.slice(0,8).map(({s,gaps})=>barRow(s.name,gaps,`${gaps}/${members.length}`,'#ef4444',members.length)).join('')}</div>`;
@@ -1942,11 +1986,11 @@ function renderGaps(){
 // REPORTS
 // ═══════════════════════════════════════════════════
 function renderReports(){
-  const members=D.members,skills=D.skills;
+  const members=scopedMembers(),skills=D.skills;
   const memberBars=members.map(m=>{const avg=skills.reduce((s2,s)=>s2+getLevel(m.id,s.id),0)/skills.length;const info=LV[Math.round(avg)]||LV[0];return barRow(m.name,avg,avg.toFixed(1),info.color,5);}).join('');
   const skillBars=skills.map(s=>{const avg=members.reduce((s2,m)=>s2+getLevel(m.id,s.id),0)/members.length;const info=LV[Math.round(avg)]||LV[0];return barRow(s.name,avg,avg.toFixed(1),info.color,5);}).join('');
   const catBars=[...new Set(skills.map(s=>s.category))].map(cat=>{const cs=skills.filter(s=>s.category===cat);const avg=members.reduce((s2,m)=>s2+cs.reduce((s3,s)=>s3+getLevel(m.id,s.id),0),0)/(members.length*cs.length);const cc=CAT[cat]||{text:'#64748b'};return barRow(cat,avg,avg.toFixed(1),cc.text,5);}).join('');
-  const intBars=[...skills].sort((a,b)=>D.members.filter(m=>getInterest(m.id,b.id)).length-D.members.filter(m=>getInterest(m.id,a.id)).length).slice(0,10).map(s=>{const count=members.filter(m=>getInterest(m.id,s.id)).length;return barRow(s.name,count,`${count} people`,'#2563eb',members.length);}).join('');
+  const intBars=[...skills].sort((a,b)=>members.filter(m=>getInterest(m.id,b.id)).length-members.filter(m=>getInterest(m.id,a.id)).length).slice(0,10).map(s=>{const count=members.filter(m=>getInterest(m.id,s.id)).length;return barRow(s.name,count,`${count} people`,'#2563eb',members.length);}).join('');
   document.getElementById('reportGrid').innerHTML=`
     <div class="report-card"><h3>Avg Level by Member</h3><div class="chart-row">${memberBars}</div></div>
     <div class="report-card"><h3>Avg Level by Skill</h3><div class="chart-row">${skillBars}</div></div>
@@ -2092,6 +2136,9 @@ async function testEmail(){
 function openAddMember(){
   document.getElementById('nm-roleId').innerHTML='<option value="">Select role…</option>'+D.roles.map(r=>`<option value="${r.id}">${h(r.name)}</option>`).join('');
   document.getElementById('nm-deptId').innerHTML='<option value="">Select department…</option>'+D.departments.map(d=>`<option value="${d.id}">${h(d.name)}</option>`).join('');
+  document.getElementById('nm-managerId').innerHTML =
+    '<option value="">No manager</option>' +
+    D.members.map(x => `<option value="${x.id}">${h(x.name)}</option>`).join('');
   document.getElementById('nm-name').value='';
   document.getElementById('nm-email').value='';
   updateEmailReadyBadge();
@@ -2130,7 +2177,7 @@ async function addMember(){
   const palette  = ['#6366f1','#8b5cf6','#ec4899','#f97316','#14b8a6','#f43f5e','#3b82f6','#10b981'];
   const color    = palette[D.members.length % palette.length];
   const newMemberId = D.nextMemberId++;
-  D.members.push({ id:newMemberId, name, roleId, deptId, managerId:null, initials, color, email });
+  D.members.push({ id:newMemberId, name, roleId, deptId, managerId: parseInt(document.getElementById('nm-managerId').value) || null, initials, color, email });
   saveData();
 
   // Add to auth system
@@ -2230,10 +2277,22 @@ function logout() {
 (function guardAdmin() {
   const sess = getSession();
   if (!sess) { window.location.replace('login.html'); return; }
-  if (sess.role !== 'admin') { window.location.replace('user.html'); return; }
-  // Greet admin in sidebar footer
+  if (sess.role !== 'admin' && sess.role !== 'manager') { window.location.replace('user.html'); return; }
+  // Apply scope class
+  if (sess.role === 'manager') document.body.classList.add('is-manager');
+  // Update sidebar footer
   const nameEl = document.querySelector('.f-name');
   if (nameEl) nameEl.textContent = sess.name || 'Admin';
+  // Update role badge
+  const tagEl = document.querySelector('.admin-tag');
+  if (tagEl) {
+    if (sess.role === 'manager') {
+      tagEl.textContent = 'Manager';
+      tagEl.style.background = '#f0fdf4';
+      tagEl.style.color = '#16a34a';
+      tagEl.style.borderColor = '#bbf7d0';
+    }
+  }
 })();
 
 // ═══════════════════════════════════════════════════
