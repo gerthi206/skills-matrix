@@ -1799,18 +1799,9 @@ async function addMember(){
     const auth = JSON.parse(localStorage.getItem(AUTH_KEY)||'null');
     if(auth && auth.users){
       const newUserId = Math.max(...auth.users.map(u=>u.id)) + 1;
-      const { genSecret } = window; // defined in login.html — redefine here
-      function genSecretLocal(){
-        const alpha='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-        const bytes=crypto.getRandomValues(new Uint8Array(20));
-        let bits=0,val=0,out='';
-        for(const b of bytes){val=(val<<8)|b;bits+=8;while(bits>=5){out+=alpha[(val>>(bits-5))&31];bits-=5;}}
-        return out;
-      }
       auth.users.push({
         id: newUserId, email, passwordHash,
         name, role:'employee', memberId: newMemberId,
-        totpSecret: genSecretLocal(), totpEnabled: false,
         mustChangePassword: true,
       });
       localStorage.setItem(AUTH_KEY, JSON.stringify(auth));

@@ -10,18 +10,9 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 40%,#2563eb 70%,#3b82f6 100%);padding:20px}
 .card{background:#fff;border-radius:16px;width:420px;max-width:100%;box-shadow:0 24px 64px rgba(0,0,0,.2);overflow:hidden}
 .card-top{padding:28px 32px 0}
-.brand{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:28px}
 .brand-icon{width:36px;height:36px;background:var(--primary);border-radius:9px;display:flex;align-items:center;justify-content:center}
 .brand-name{font-size:18px;font-weight:800;color:var(--text)}.brand-name span{color:var(--primary)}
-.step-indicator{display:flex;align-items:center;gap:0;margin-bottom:24px}
-.step{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--subtle)}
-.step.active{color:var(--primary)}
-.step.done{color:var(--success)}
-.step-num{width:22px;height:22px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
-.step.done .step-num{background:var(--success);border-color:var(--success);color:#fff}
-.step.active .step-num{background:var(--primary);border-color:var(--primary);color:#fff}
-.step-line{flex:1;height:2px;background:var(--border);margin:0 8px}
-.step-line.done{background:var(--success)}
 .card-body{padding:0 32px 28px}
 h2{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-.3px}
 .sub{font-size:13.5px;color:var(--muted);margin-bottom:22px;line-height:1.5}
@@ -39,32 +30,9 @@ h2{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spa
 .submit-btn{width:100%;padding:11px;border-radius:9px;border:none;background:var(--primary);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;transition:background .15s;margin-top:4px}
 .submit-btn:hover{background:var(--primary-hover)}
 .submit-btn:disabled{background:#93c5fd;cursor:not-allowed}
-.back-link{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--muted);cursor:pointer;background:none;border:none;padding:0;margin-top:16px;font-family:inherit;transition:color .15s}
-.back-link:hover{color:var(--primary)}
-
-/* OTP input */
-.otp-row{display:flex;gap:8px;justify-content:center;margin:20px 0}
-.otp-digit{width:46px;height:54px;border:2px solid var(--border);border-radius:10px;font-size:22px;font-weight:800;text-align:center;outline:none;color:var(--text);transition:border-color .15s;caret-color:transparent}
-.otp-digit:focus{border-color:var(--primary);background:var(--primary-light)}
-.otp-digit.filled{border-color:var(--primary)}
-
-/* Timer ring */
-.timer-wrap{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding:8px 12px;background:#f8fafc;border-radius:8px;font-size:12.5px;color:var(--muted)}
-.timer-ring{width:28px;height:28px;flex-shrink:0}
-
-/* TOTP Setup */
-.secret-box{background:#f8fafc;border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;margin:14px 0;font-family:monospace;font-size:15px;font-weight:700;letter-spacing:.2em;color:var(--text);text-align:center;word-break:break-all}
-.secret-copy{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--primary);cursor:pointer;justify-content:center;margin-top:6px;background:none;border:none;font-family:inherit;padding:0}
-.secret-copy:hover{text-decoration:underline}
-.qr-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin:14px 0}
-.qr-wrap img{width:180px;height:180px;border-radius:10px;border:1px solid var(--border)}
-.qr-wrap .qr-fallback{width:180px;height:180px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);text-align:center;padding:16px}
-.apps-row{display:flex;gap:10px;justify-content:center;margin:12px 0;flex-wrap:wrap}
-.app-chip{font-size:11px;padding:3px 10px;border-radius:12px;background:#f1f5f9;color:var(--muted);font-weight:600}
-.step-divider{border:none;border-top:1px solid var(--border);margin:16px 0}
 
 /* Demo panel */
-.demo-panel{margin:0 32px 20px;background:#fefce8;border:1.5px solid #fde047;border-radius:10px;padding:14px}
+.demo-panel{margin:0 32px 24px;background:#fefce8;border:1.5px solid #fde047;border-radius:10px;padding:14px}
 .demo-panel h4{font-size:12px;font-weight:800;color:#92400e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .demo-user{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:4px}
 .demo-user:last-child{margin-bottom:0}
@@ -81,33 +49,22 @@ h2{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spa
 .spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Tab showing */
 .step-panel{display:none}.step-panel.active{display:block;animation:fadeUp .2s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-.divider{display:flex;align-items:center;gap:10px;margin:18px 0;font-size:12px;color:var(--subtle)}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
 </style>
 </head>
 <body>
 
 <div class="card">
-  <!-- Brand -->
   <div class="card-top">
     <div class="brand">
       <div class="brand-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
       <div class="brand-name">Skills<span>Base</span></div>
     </div>
-    <!-- Step indicator -->
-    <div class="step-indicator" id="stepIndicator">
-      <div class="step active" id="si-1"><div class="step-num">1</div>Sign In</div>
-      <div class="step-line" id="sl-1"></div>
-      <div class="step" id="si-2"><div class="step-num">2</div>2FA</div>
-    </div>
   </div>
 
-  <!-- Step 1: Sign in -->
   <div class="card-body">
+    <!-- Sign In -->
     <div class="step-panel active" id="panel-signin">
       <h2>Welcome back</h2>
       <p class="sub">Sign in to your account to continue</p>
@@ -126,62 +83,6 @@ h2{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spa
       </div>
       <div class="err-msg" id="signinErr">Invalid email or password.</div>
       <button class="submit-btn" id="signinBtn" onclick="handleSignin()">Sign In</button>
-    </div>
-
-    <!-- Step 2a: TOTP Setup (first time) -->
-    <div class="step-panel" id="panel-setup">
-      <h2>Set up two-factor authentication</h2>
-      <p class="sub">Scan the QR code with your authenticator app, then enter the 6-digit code to confirm.</p>
-      <div class="apps-row">
-        <span class="app-chip">Google Authenticator</span>
-        <span class="app-chip">Authy</span>
-        <span class="app-chip">Microsoft Authenticator</span>
-        <span class="app-chip">1Password</span>
-      </div>
-      <hr class="step-divider">
-      <div class="qr-wrap">
-        <img id="qrImg" src="" alt="QR Code" onerror="this.style.display='none';document.getElementById('qrFallback').style.display='flex'">
-        <div class="qr-fallback" id="qrFallback" style="display:none">QR code unavailable offline. Use the secret key below.</div>
-      </div>
-      <div class="divider">or enter key manually</div>
-      <div class="form-field" style="margin-bottom:4px">
-        <label class="form-label">Secret Key</label>
-        <div class="secret-box" id="secretDisplay"></div>
-        <button class="secret-copy" onclick="copySecret()">
-          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-          <span id="copyTxt">Copy to clipboard</span>
-        </button>
-      </div>
-      <hr class="step-divider">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:10px">Enter the 6-digit code from your app to verify setup:</p>
-      <div class="otp-row" id="setupOtpRow"></div>
-      <div class="err-msg" id="setupErr">Incorrect code. Please try again.</div>
-      <button class="submit-btn" id="setupBtn" onclick="handleSetupVerify()">Verify &amp; Enable 2FA</button>
-      <button class="back-link" onclick="goBack()">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-        Back to sign in
-      </button>
-    </div>
-
-    <!-- Step 2b: TOTP Verify (returning) -->
-    <div class="step-panel" id="panel-verify">
-      <h2>Two-factor authentication</h2>
-      <p class="sub">Enter the 6-digit code from your authenticator app.</p>
-      <div class="timer-wrap" id="timerWrap">
-        <svg class="timer-ring" id="timerSvg" viewBox="0 0 28 28">
-          <circle cx="14" cy="14" r="11" fill="none" stroke="#e2e8f0" stroke-width="3"/>
-          <circle cx="14" cy="14" r="11" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round"
-            id="timerArc" stroke-dasharray="69.1" stroke-dashoffset="0" transform="rotate(-90 14 14)"/>
-        </svg>
-        <span id="timerTxt">Code refreshes in <strong id="timerSec">30</strong>s</span>
-      </div>
-      <div class="otp-row" id="verifyOtpRow"></div>
-      <div class="err-msg" id="verifyErr">Incorrect code. Check your app and try again.</div>
-      <button class="submit-btn" id="verifyBtn" onclick="handleVerify()">Verify</button>
-      <button class="back-link" onclick="goBack()">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-        Back to sign in
-      </button>
     </div>
 
     <!-- Success -->
@@ -215,7 +116,7 @@ h2{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spa
 
 <script>
 // ════════════════════════════════════════════════════
-// CRYPTO HELPERS
+// CRYPTO — password hashing
 // ════════════════════════════════════════════════════
 const SALT = 'skillsbase_2fa_salt_v1:';
 
@@ -223,51 +124,6 @@ async function sha256(str) {
   const data = new TextEncoder().encode(SALT + str);
   const buf = await crypto.subtle.digest('SHA-256', data);
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-function b32decode(s) {
-  const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  s = s.toUpperCase().replace(/[^A-Z2-7]/g, '');
-  const out = []; let bits = 0, val = 0;
-  for (const c of s) {
-    const idx = alpha.indexOf(c);
-    if (idx < 0) continue;
-    val = (val << 5) | idx; bits += 5;
-    if (bits >= 8) { out.push((val >>> (bits - 8)) & 0xff); bits -= 8; }
-  }
-  return new Uint8Array(out);
-}
-
-function genSecret() {
-  const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  const bytes = crypto.getRandomValues(new Uint8Array(20));
-  let bits = 0, val = 0, out = '';
-  for (const b of bytes) {
-    val = (val << 8) | b; bits += 8;
-    while (bits >= 5) { out += alpha[(val >> (bits - 5)) & 31]; bits -= 5; }
-  }
-  return out;
-}
-
-async function genTOTP(secret, drift = 0) {
-  const t = Math.floor(Date.now() / 30000) + drift;
-  const buf = new ArrayBuffer(8);
-  new DataView(buf).setUint32(4, t >>> 0, false);
-  const secretBytes = b32decode(secret);
-  const key = await crypto.subtle.importKey('raw', secretBytes, { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']);
-  const sig = new Uint8Array(await crypto.subtle.sign('HMAC', key, buf));
-  const off = sig[sig.length - 1] & 0xf;
-  const code = ((sig[off] & 0x7f) << 24 | sig[off + 1] << 16 | sig[off + 2] << 8 | sig[off + 3]) % 1_000_000;
-  return code.toString().padStart(6, '0');
-}
-
-async function verifyTOTP(secret, input) {
-  input = input.trim();
-  if (input.length !== 6 || !/^\d+$/.test(input)) return false;
-  for (const d of [-1, 0, 1]) {
-    if (await genTOTP(secret, d) === input) return true;
-  }
-  return false;
 }
 
 // ════════════════════════════════════════════════════
@@ -285,22 +141,11 @@ function saveAuth(d) { localStorage.setItem(AUTH_KEY, JSON.stringify(d)); }
 async function initAuth() {
   let auth = loadAuth();
   if (auth && auth.initialized) return auth;
-  // First-time setup — hash default passwords and generate TOTP secrets
   auth = {
     initialized: true,
     users: [
-      {
-        id: 1, email: 'admin@company.com',
-        passwordHash: await sha256('Admin123!'),
-        name: 'Admin User', role: 'admin', memberId: null,
-        totpSecret: genSecret(), totpEnabled: false,
-      },
-      {
-        id: 2, email: 'carol@company.com',
-        passwordHash: await sha256('Carol123!'),
-        name: 'Carol Davis', role: 'employee', memberId: 3,
-        totpSecret: genSecret(), totpEnabled: false,
-      },
+      { id: 1, email: 'admin@company.com', passwordHash: await sha256('Admin123!'), name: 'Admin User', role: 'admin', memberId: null },
+      { id: 2, email: 'carol@company.com', passwordHash: await sha256('Carol123!'), name: 'Carol Davis', role: 'employee', memberId: 3 },
     ],
   };
   saveAuth(auth);
@@ -308,106 +153,17 @@ async function initAuth() {
 }
 
 function createSession(user) {
-  const sess = {
+  sessionStorage.setItem(SESS_KEY, JSON.stringify({
     userId: user.id, name: user.name,
     role: user.role, memberId: user.memberId,
     expires: Date.now() + SESSION_HOURS * 3600 * 1000,
-  };
-  sessionStorage.setItem(SESS_KEY, JSON.stringify(sess));
+  }));
 }
 
 // ════════════════════════════════════════════════════
 // STATE
 // ════════════════════════════════════════════════════
 let AUTH = null;
-let currentUser = null;
-let timerInterval = null;
-
-// ════════════════════════════════════════════════════
-// STEP NAVIGATION
-// ════════════════════════════════════════════════════
-function showPanel(id) {
-  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel-' + id).classList.add('active');
-  document.getElementById('demoPanel').style.display = (id === 'signin') ? '' : 'none';
-}
-
-function setStep(n) {
-  [1, 2].forEach(i => {
-    document.getElementById('si-' + i).classList.remove('active', 'done');
-    if (i < n) document.getElementById('si-' + i).classList.add('done');
-    else if (i === n) document.getElementById('si-' + i).classList.add('active');
-  });
-  [1].forEach(i => {
-    document.getElementById('sl-' + i).classList.toggle('done', i < n);
-  });
-}
-
-// ════════════════════════════════════════════════════
-// OTP INPUT BUILDER
-// ════════════════════════════════════════════════════
-function buildOtpInputs(containerId) {
-  const row = document.getElementById(containerId);
-  row.innerHTML = '';
-  for (let i = 0; i < 6; i++) {
-    const inp = document.createElement('input');
-    inp.type = 'text'; inp.inputMode = 'numeric';
-    inp.maxLength = 1; inp.className = 'otp-digit';
-    inp.dataset.idx = i;
-    inp.addEventListener('input', e => {
-      const val = e.target.value.replace(/\D/g, '');
-      e.target.value = val.slice(-1);
-      if (val && i < 5) row.children[i + 1].focus();
-      updateFilled(row);
-    });
-    inp.addEventListener('keydown', e => {
-      if (e.key === 'Backspace' && !e.target.value && i > 0) row.children[i - 1].focus();
-      if (e.key === 'Enter') { e.preventDefault(); if (containerId === 'setupOtpRow') handleSetupVerify(); else handleVerify(); }
-    });
-    inp.addEventListener('paste', e => {
-      e.preventDefault();
-      const pasted = (e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6);
-      [...pasted].forEach((ch, j) => { if (row.children[j]) { row.children[j].value = ch; updateFilled(row); } });
-      const next = Math.min(pasted.length, 5);
-      row.children[next].focus();
-    });
-    row.appendChild(inp);
-  }
-}
-
-function updateFilled(row) {
-  [...row.children].forEach(inp => inp.classList.toggle('filled', !!inp.value));
-}
-
-function getOtp(containerId) {
-  return [...document.getElementById(containerId).children].map(i => i.value).join('');
-}
-
-function clearOtp(containerId) {
-  [...document.getElementById(containerId).children].forEach(i => { i.value = ''; i.classList.remove('filled'); });
-  document.getElementById(containerId).children[0].focus();
-}
-
-// ════════════════════════════════════════════════════
-// TIMER (30s TOTP window)
-// ════════════════════════════════════════════════════
-function startTimer() {
-  if (timerInterval) clearInterval(timerInterval);
-  const arc = document.getElementById('timerArc');
-  const secEl = document.getElementById('timerSec');
-  const C = 2 * Math.PI * 11; // circumference
-
-  function tick() {
-    const rem = 30 - (Math.floor(Date.now() / 1000) % 30);
-    secEl.textContent = rem;
-    arc.style.strokeDashoffset = C * (1 - rem / 30);
-    arc.style.stroke = rem <= 5 ? '#ef4444' : '#2563eb';
-  }
-  tick();
-  timerInterval = setInterval(tick, 500);
-}
-
-function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
 
 // ════════════════════════════════════════════════════
 // SIGN IN
@@ -430,111 +186,18 @@ async function handleSignin() {
 
   if (!user) { errEl.classList.add('show'); return; }
 
-  currentUser = user;
-  setStep(2);
-
-  if (!user.totpEnabled) {
-    // First time — show setup
-    showSetup(user);
-  } else {
-    // Returning — show verify
-    showVerify();
-  }
-}
-
-// ════════════════════════════════════════════════════
-// TOTP SETUP (first time)
-// ════════════════════════════════════════════════════
-function showSetup(user) {
-  buildOtpInputs('setupOtpRow');
-  const secret = user.totpSecret;
-  const issuer = 'SkillsBase';
-  const label = encodeURIComponent(`${issuer}:${user.email}`);
-  const otpUri = `otpauth://totp/${label}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=6&period=30`;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpUri)}`;
-
-  document.getElementById('qrImg').src = qrUrl;
-  document.getElementById('qrFallback').style.display = 'none';
-
-  // Format secret in groups of 4
-  document.getElementById('secretDisplay').textContent = secret.match(/.{1,4}/g).join(' ');
-  showPanel('setup');
-  setTimeout(() => document.getElementById('setupOtpRow').children[0].focus(), 100);
-}
-
-async function handleSetupVerify() {
-  const code = getOtp('setupOtpRow');
-  const errEl = document.getElementById('setupErr');
-  const btn = document.getElementById('setupBtn');
-  errEl.classList.remove('show');
-
-  if (code.length < 6) { errEl.textContent = 'Please enter all 6 digits.'; errEl.classList.add('show'); return; }
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Verifying…';
-  const ok = await verifyTOTP(currentUser.totpSecret, code);
-  btn.disabled = false;
-  btn.textContent = 'Verify & Enable 2FA';
-
-  if (!ok) { errEl.textContent = 'Incorrect code. Check your authenticator app.'; errEl.classList.add('show'); clearOtp('setupOtpRow'); return; }
-
-  // Enable TOTP for this user
-  const idx = AUTH.users.findIndex(u => u.id === currentUser.id);
-  AUTH.users[idx].totpEnabled = true;
-  saveAuth(AUTH);
-  currentUser = AUTH.users[idx];
-  signInSuccess();
-}
-
-// ════════════════════════════════════════════════════
-// TOTP VERIFY (returning)
-// ════════════════════════════════════════════════════
-function showVerify() {
-  buildOtpInputs('verifyOtpRow');
-  startTimer();
-  showPanel('verify');
-  setTimeout(() => document.getElementById('verifyOtpRow').children[0].focus(), 100);
-}
-
-async function handleVerify() {
-  const code = getOtp('verifyOtpRow');
-  const errEl = document.getElementById('verifyErr');
-  const btn = document.getElementById('verifyBtn');
-  errEl.classList.remove('show');
-
-  if (code.length < 6) { errEl.textContent = 'Please enter all 6 digits.'; errEl.classList.add('show'); return; }
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Verifying…';
-  const ok = await verifyTOTP(currentUser.totpSecret, code);
-  btn.disabled = false;
-  btn.textContent = 'Verify';
-
-  if (!ok) { errEl.classList.add('show'); clearOtp('verifyOtpRow'); return; }
-  stopTimer();
-  signInSuccess();
-}
-
-// ════════════════════════════════════════════════════
-// SUCCESS + REDIRECT
-// ════════════════════════════════════════════════════
-function signInSuccess() {
-  createSession(currentUser);
+  createSession(user);
   showPanel('success');
-  const target = currentUser.role === 'admin' ? 'admin.html' : 'user.html';
-  setTimeout(() => { window.location.replace(target); }, 1200);
+  document.getElementById('demoPanel').style.display = 'none';
+  setTimeout(() => { window.location.replace(user.role === 'admin' ? 'admin.html' : 'user.html'); }, 1000);
 }
 
 // ════════════════════════════════════════════════════
 // HELPERS
 // ════════════════════════════════════════════════════
-function goBack() {
-  stopTimer();
-  currentUser = null;
-  setStep(1);
-  document.getElementById('signinErr').classList.remove('show');
-  document.getElementById('pwdInput').value = '';
-  showPanel('signin');
+function showPanel(id) {
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
 }
 
 function togglePwd() {
@@ -552,36 +215,17 @@ function togglePwd() {
 function fillDemo(email, pwd) {
   document.getElementById('emailInput').value = email;
   document.getElementById('pwdInput').value = pwd;
-  document.getElementById('emailInput').focus();
 }
 
-async function copySecret() {
-  const secret = currentUser?.totpSecret || '';
-  try {
-    await navigator.clipboard.writeText(secret);
-    document.getElementById('copyTxt').textContent = 'Copied!';
-    setTimeout(() => document.getElementById('copyTxt').textContent = 'Copy to clipboard', 2000);
-  } catch {}
-}
-
-function logout() {
-  sessionStorage.removeItem(SESS_KEY);
-  window.location.replace('login.html');
-}
-
-// Enter key on password field
-document.getElementById('pwdInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') handleSignin();
-});
-document.getElementById('emailInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('pwdInput').focus();
-});
+// Keyboard shortcuts
+document.getElementById('pwdInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleSignin(); });
+document.getElementById('emailInput').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('pwdInput').focus(); });
 
 // ════════════════════════════════════════════════════
-// INIT — check if already logged in
+// INIT
 // ════════════════════════════════════════════════════
 (async function() {
-  // If already has a valid session, skip login
+  // Redirect if already logged in
   try {
     const sess = JSON.parse(sessionStorage.getItem(SESS_KEY) || 'null');
     if (sess && sess.expires > Date.now()) {
