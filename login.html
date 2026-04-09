@@ -144,16 +144,26 @@ function saveAuth(d) { localStorage.setItem(AUTH_KEY, JSON.stringify(d)); }
 
 async function initAuth() {
   let auth = loadAuth();
-  if (auth && auth.initialized) return auth;
-  auth = {
-    initialized: true,
-    users: [
-      { id: 1, email: 'admin@company.com', passwordHash: await sha256('Admin123!'), name: 'Admin User', role: 'admin', memberId: null },
-      { id: 2, email: 'carol@company.com', passwordHash: await sha256('Carol123!'), name: 'Carol Davis', role: 'employee', memberId: 3 },
-      { id: 3, email: 'alice@company.com', passwordHash: await sha256('Alice123!'), name: 'Alice Johnson', role: 'manager', memberId: 1 },
-    ],
-  };
-  saveAuth(auth);
+  if (!auth || !auth.initialized) {
+    auth = {
+      initialized: true,
+      users: [
+        { id: 1, email: 'admin@company.com', passwordHash: await sha256('Admin123!'), name: 'Admin User', role: 'admin', memberId: null },
+        { id: 2, email: 'carol@company.com', passwordHash: await sha256('Carol123!'), name: 'Carol Davis', role: 'employee', memberId: 3 },
+        { id: 3, email: 'alice@company.com', passwordHash: await sha256('Alice123!'), name: 'Alice Johnson', role: 'manager', memberId: 1 },
+      ],
+    };
+    saveAuth(auth);
+    return auth;
+  }
+  // Migration: add any missing demo accounts
+  let changed = false;
+  if (!auth.users.find(u => u.email === 'alice@company.com')) {
+    const nextId = Math.max(...auth.users.map(u => u.id)) + 1;
+    auth.users.push({ id: nextId, email: 'alice@company.com', passwordHash: await sha256('Alice123!'), name: 'Alice Johnson', role: 'manager', memberId: 1 });
+    changed = true;
+  }
+  if (changed) saveAuth(auth);
   return auth;
 }
 
