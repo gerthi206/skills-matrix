@@ -401,10 +401,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
       <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
       <input type="text" id="searchInput" placeholder="Search skills…" oninput="applyFilters()">
     </div>
-    <a href="admin.html" class="topbar-link">
+    <a href="admin.html" class="topbar-link" id="adminViewLink" style="display:none">
       <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
       Admin View
     </a>
+    <button class="topbar-link" onclick="logout()" style="cursor:pointer;border:1.5px solid #fecaca;color:#dc2626;background:#fef2f2">
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign Out
+    </button>
   </header>
 
   <div class="content-area">
@@ -1047,9 +1051,65 @@ document.getElementById('editModal').addEventListener('click',e=>{if(e.target===
 function h(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // ═══════════════════════════════════════════════════
+// SESSION GUARD + LOGOUT
+// ═══════════════════════════════════════════════════
+const SESS_KEY = 'sbSession';
+
+function getSession() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem(SESS_KEY) || 'null');
+    return (s && s.expires > Date.now()) ? s : null;
+  } catch { return null; }
+}
+
+function logout() {
+  sessionStorage.removeItem(SESS_KEY);
+  window.location.replace('login.html');
+}
+
+(function guardUser() {
+  const sess = getSession();
+  if (!sess) { window.location.replace('login.html'); return; }
+
+  // Show Admin View link only for admins
+  if (sess.role === 'admin') {
+    document.getElementById('adminViewLink').style.display = '';
+  }
+
+  // Update sidebar footer with real user name/role from session
+  const nameEl = document.querySelector('.f-name');
+  const roleEl = document.querySelector('.f-role');
+  if (nameEl) nameEl.textContent = sess.name || 'Employee';
+
+  // Override ME_ID if session has a memberId
+  if (sess.memberId) {
+    // ME_ID is a const — patch after data loads via a deferred override
+    window.__sessionMemberId = sess.memberId;
+  }
+})();
+
+// ═══════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════
 loadData();
+
+// Apply session member override if present
+if (window.__sessionMemberId) {
+  const overrideId = parseInt(window.__sessionMemberId);
+  const overrideMember = D.members.find(m => m.id === overrideId);
+  if (overrideMember) {
+    // Patch the module-level ME_ID by redefining the me() helper
+    window.__ME_ID_OVERRIDE = overrideId;
+  }
+}
+
+// Patch me() to use session member if available
+const _origMe = me;
+function me() {
+  const id = window.__ME_ID_OVERRIDE || ME_ID;
+  return D.members.find(m => m.id === id) || D.members.find(m => m.id === ME_ID);
+}
+
 renderOverview();
 </script>
 </body>
