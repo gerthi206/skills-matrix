@@ -389,6 +389,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+
+/* ── PERSON CARD ACTION BAR ── */
+.pc-actions{display:flex;gap:6px;justify-content:flex-end;padding-top:10px;border-top:1px solid var(--border);margin-top:10px}
+.pc-action-btn{width:30px;height:30px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:all .15s;flex-shrink:0}
+.pc-action-btn:hover{border-color:var(--primary);color:var(--primary)}
+.pc-action-btn.danger:hover{border-color:#ef4444;color:#dc2626}
+
+/* ── COLOR SWATCH PICKER ── */
+.color-swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s;flex-shrink:0}
+.color-swatch.selected{border-color:#fff;box-shadow:0 0 0 3px #2563eb}
+
+/* ── DEPTS TAB ── */
+.depts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.dept-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);cursor:pointer;transition:all .15s;position:relative}
+.dept-card:hover{border-color:var(--primary);box-shadow:0 4px 16px rgba(37,99,235,.12);transform:translateY(-1px)}
+.dept-card-edit{position:absolute;top:12px;right:12px;color:var(--subtle);opacity:.6}
+.dept-card-edit:hover{opacity:1;color:var(--primary)}
 </style>
 </head>
 <body>
@@ -503,6 +521,63 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 
+<!-- EDIT MEMBER MODAL -->
+<div class="overlay" id="editMemberModal">
+  <div class="modal" style="width:500px">
+    <div class="modal-hdr">
+      <div class="modal-title">Edit Member</div>
+      <div class="modal-sub">Update member details and credentials</div>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="ff"><label>Full Name *</label><input class="fi" id="em-name" placeholder="e.g. Jane Smith"/></div>
+        <div class="ff"><label>Email Address *</label><input class="fi" id="em-email" type="email" placeholder="jane@company.com"/></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="ff"><label>Role</label>
+          <select class="fs" id="em-roleId"><option value="">No role</option></select>
+        </div>
+        <div class="ff"><label>Department</label>
+          <select class="fs" id="em-deptId"><option value="">No department</option></select>
+        </div>
+      </div>
+      <div class="ff">
+        <label>Avatar Color</label>
+        <div class="color-swatches" id="em-colorSwatches"></div>
+      </div>
+    </div>
+    <div class="modal-ftr" style="gap:8px">
+      <button class="btn btn-secondary" onclick="closeEditMember()">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteMember(_editMemberId)">Delete Member</button>
+      <button class="btn btn-secondary btn-sm" onclick="resetMemberPassword(_editMemberId)">Reset Password</button>
+      <button class="btn btn-primary" onclick="saveEditMember()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD / EDIT DEPARTMENT MODAL -->
+<div class="overlay" id="deptModal">
+  <div class="modal" style="width:440px">
+    <div class="modal-hdr">
+      <div class="modal-title" id="deptModalTitle">Add Department</div>
+      <div class="modal-sub" id="deptModalSub">Define a department for your organisation</div>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+      <div class="ff"><label>Department Name *</label><input class="fi" id="dm-name" placeholder="e.g. Marketing"/></div>
+      <div class="ff">
+        <label>Color</label>
+        <div class="color-swatches" id="dm-colorSwatches"></div>
+      </div>
+    </div>
+    <div class="modal-ftr" style="gap:8px">
+      <button class="btn btn-secondary" onclick="closeDeptModal()">Cancel</button>
+      <button class="btn btn-danger btn-sm" id="deptDeleteBtn" style="display:none" onclick="deleteDept(_editDeptId)">Delete Department</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-primary" onclick="saveDept()">Save Department</button>
+    </div>
+  </div>
+</div>
+
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-brand">
@@ -522,6 +597,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <div class="nav-item" data-tab="roles" onclick="navTo('roles',this)">
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
       Roles
+    </div>
+    <div class="nav-item" data-tab="depts" onclick="navTo('depts',this)">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Departments
     </div>
     <div class="nav-section">Skills</div>
     <div class="nav-item" data-tab="matrix" onclick="navTo('matrix',this)">
@@ -623,6 +702,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         </div>
       </div>
       <div class="roles-grid" id="rolesGrid"></div>
+    </div>
+
+    <!-- DEPARTMENTS -->
+    <div class="tab-panel" id="tab-depts">
+      <div class="page-header">
+        <div class="page-header-text"><h2>Departments</h2><p>Manage your organisation's departments</p></div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" onclick="openAddDept()">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Add Department
+          </button>
+        </div>
+      </div>
+      <div class="depts-grid" id="deptsGrid"></div>
     </div>
 
     <!-- SKILLS MATRIX -->
@@ -845,7 +938,7 @@ const DEF = {
     "6-5":true,"6-6":true,"6-7":true,
   },
   settings:{avgRow:true,gapIndicators:true,showInterest:true,selfAssess:true},
-  nextMemberId:7,nextSkillId:15,nextRoleId:6,currentUserId:3,
+  nextMemberId:7,nextSkillId:15,nextRoleId:6,nextDeptId:4,currentUserId:3,
 };
 
 let D=null;
@@ -854,6 +947,7 @@ function loadData(){
   if(!D){resetToDefault();return;}
   // Migrations
   if(!D.nextRoleId) D.nextRoleId=D.roles.reduce((m,r)=>Math.max(m,r.id),0)+1;
+  if(!D.nextDeptId) D.nextDeptId=D.departments.reduce((m,d)=>Math.max(m,d.id),0)+1;
   D.roles.forEach(r=>{if(!r.targets)r.targets={};});
 }
 function saveData(){localStorage.setItem(SK,JSON.stringify(D));}
@@ -894,7 +988,7 @@ let activeTab='dashboard',gapsOnly=false,editTarget=null,selLevel=null,selIntere
 // ═══════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════
-const TITLES={dashboard:'Dashboard',people:'People',roles:'Roles',matrix:'Skills Matrix',library:'Skill Library',gaps:'Gap Analysis',reports:'Reports',settings:'Settings'};
+const TITLES={dashboard:'Dashboard',people:'People',roles:'Roles',depts:'Departments',matrix:'Skills Matrix',library:'Skill Library',gaps:'Gap Analysis',reports:'Reports',settings:'Settings'};
 
 function navTo(tab,el){
   activeTab=tab;
@@ -910,6 +1004,7 @@ function navTo(tab,el){
   if(tab==='dashboard') renderDashboard();
   if(tab==='people') renderPeople();
   if(tab==='roles') renderRoles();
+  if(tab==='depts') renderDepts();
   if(tab==='matrix'){populateFilters();renderMatrix();}
   if(tab==='library') renderLibrary();
   if(tab==='gaps') renderGaps();
@@ -1029,6 +1124,14 @@ function renderPeople(){
         <div class="pc-stat"><div class="pc-stat-val">${avgLv}</div><div class="pc-stat-lbl">Avg Level</div></div>
         <div class="pc-stat"><div class="pc-stat-val" style="color:#16a34a">${atTarget}</div><div class="pc-stat-lbl">At Target</div></div>
         <div class="pc-stat"><div class="pc-stat-val" style="color:${gaps>0?'#dc2626':'#16a34a'}">${gaps}</div><div class="pc-stat-lbl">Gaps</div></div>
+      </div>
+      <div class="pc-actions">
+        <button class="pc-action-btn" title="Edit member" onclick="event.stopPropagation();openEditMember(${m.id})">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="pc-action-btn danger" title="Delete member" onclick="event.stopPropagation();deleteMember(${m.id})">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+        </button>
       </div>
     </div>`;
   }).join('');
@@ -1376,6 +1479,243 @@ function deleteRole(){
   renderRoles();
   showToast(`Role "${role.name}" deleted.`,'warn');
 }
+
+// ═══════════════════════════════════════════════════
+// EDIT / DELETE MEMBER
+// ═══════════════════════════════════════════════════
+let _editMemberId = null;
+let _editMemberColor = '#6366f1';
+const MEMBER_COLORS = ['#6366f1','#8b5cf6','#ec4899','#f97316','#14b8a6','#f43f5e','#3b82f6','#10b981'];
+
+function _buildMemberColorSwatches(containerId, selectedColor, onClickFn){
+  document.getElementById(containerId).innerHTML = MEMBER_COLORS.map(c=>
+    `<div class="color-swatch${c===selectedColor?' selected':''}" style="background:${c}" title="${c}" onclick="${onClickFn}('${c}')"></div>`
+  ).join('');
+}
+
+function selectMemberColor(color){
+  _editMemberColor = color;
+  _buildMemberColorSwatches('em-colorSwatches', color, 'selectMemberColor');
+}
+
+function openEditMember(id){
+  const m = D.members.find(x=>x.id===id);
+  if(!m) return;
+  _editMemberId = id;
+  _editMemberColor = m.color || '#6366f1';
+  document.getElementById('em-name').value = m.name || '';
+  document.getElementById('em-email').value = m.email || '';
+  document.getElementById('em-roleId').innerHTML =
+    '<option value="">No role</option>' +
+    D.roles.map(r=>`<option value="${r.id}"${m.roleId===r.id?' selected':''}>${h(r.name)}</option>`).join('');
+  document.getElementById('em-deptId').innerHTML =
+    '<option value="">No department</option>' +
+    D.departments.map(d=>`<option value="${d.id}"${m.deptId===d.id?' selected':''}>${h(d.name)}</option>`).join('');
+  _buildMemberColorSwatches('em-colorSwatches', _editMemberColor, 'selectMemberColor');
+  document.getElementById('editMemberModal').classList.add('open');
+  setTimeout(()=>document.getElementById('em-name').focus(), 100);
+}
+
+function closeEditMember(){
+  document.getElementById('editMemberModal').classList.remove('open');
+  _editMemberId = null;
+}
+
+function saveEditMember(){
+  const name = document.getElementById('em-name').value.trim();
+  const email = document.getElementById('em-email').value.trim().toLowerCase();
+  if(!name){ alert('Please enter the member\'s full name.'); return; }
+  if(!email || !email.includes('@')){ alert('Please enter a valid email address.'); return; }
+  const m = D.members.find(x=>x.id===_editMemberId);
+  if(!m) return;
+  // Check duplicate email (excluding self)
+  if(D.members.find(x=>x.id!==_editMemberId && x.email && x.email.toLowerCase()===email)){
+    alert('Another member with this email already exists.'); return;
+  }
+  const roleId = parseInt(document.getElementById('em-roleId').value)||null;
+  const deptId = parseInt(document.getElementById('em-deptId').value)||null;
+  const initials = name.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+  m.name = name; m.email = email; m.roleId = roleId; m.deptId = deptId;
+  m.initials = initials; m.color = _editMemberColor;
+  // Update auth store
+  try {
+    const auth = JSON.parse(localStorage.getItem('sbAuthData')||'null');
+    if(auth && auth.users){
+      const u = auth.users.find(x=>x.memberId===_editMemberId || x.email===m.email);
+      if(u){ u.name = name; u.email = email; }
+      localStorage.setItem('sbAuthData', JSON.stringify(auth));
+    }
+  } catch(e){ console.warn('Could not update auth store:', e); }
+  saveData();
+  renderPeople();
+  closeEditMember();
+  showToast(`${name} updated successfully.`, 'success');
+}
+
+function deleteMember(id){
+  const m = D.members.find(x=>x.id===id);
+  if(!m) return;
+  if(!confirm(`Delete "${m.name}"?\n\nThis will permanently remove all their skill ratings and interest data. This cannot be undone.`)) return;
+  D.members = D.members.filter(x=>x.id!==id);
+  // Remove matrix and interest entries
+  Object.keys(D.matrix).forEach(k=>{ if(k.startsWith(`${id}-`)) delete D.matrix[k]; });
+  Object.keys(D.interests).forEach(k=>{ if(k.startsWith(`${id}-`)) delete D.interests[k]; });
+  // Remove from auth store
+  try {
+    const auth = JSON.parse(localStorage.getItem('sbAuthData')||'null');
+    if(auth && auth.users){
+      auth.users = auth.users.filter(u=>u.memberId!==id);
+      localStorage.setItem('sbAuthData', JSON.stringify(auth));
+    }
+  } catch(e){ console.warn('Could not update auth store:', e); }
+  saveData();
+  // Close edit modal if open
+  document.getElementById('editMemberModal').classList.remove('open');
+  _editMemberId = null;
+  renderPeople();
+  showToast(`${m.name} has been removed.`, 'warn');
+}
+
+async function resetMemberPassword(id){
+  const m = D.members.find(x=>x.id===id);
+  if(!m) return;
+  const tempPassword = genTempPassword();
+  const passwordHash = await sha256(tempPassword);
+  try {
+    const auth = JSON.parse(localStorage.getItem('sbAuthData')||'null');
+    if(auth && auth.users){
+      const u = auth.users.find(x=>x.memberId===id);
+      if(u){
+        u.passwordHash = passwordHash;
+        u.mustChangePassword = true;
+        localStorage.setItem('sbAuthData', JSON.stringify(auth));
+      }
+    }
+  } catch(e){ console.warn('Could not update auth store:', e); }
+  const role = D.roles.find(r=>r.id===m.roleId);
+  if(isEmailConfigured()){
+    sendInviteEmail(m.name, m.email, role?.name||'Team Member', tempPassword);
+    showToast(`Password reset for ${m.name}. Temp password: ${tempPassword} — invite email sent.`, 'success', 12000);
+  } else {
+    showToast(`Password reset for ${m.name}. Temp password: ${tempPassword}`, 'warn', 12000);
+  }
+}
+
+document.getElementById('editMemberModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeEditMember();});
+
+// ═══════════════════════════════════════════════════
+// DEPARTMENTS
+// ═══════════════════════════════════════════════════
+let _editDeptId = null;
+let _editDeptColor = '#2563eb';
+const DEPT_COLORS = ['#2563eb','#7c3aed','#db2777','#ea580c','#16a34a','#0891b2','#dc2626','#ca8a04','#64748b','#0f172a'];
+
+function _buildDeptColorSwatches(selectedColor){
+  document.getElementById('dm-colorSwatches').innerHTML = DEPT_COLORS.map(c=>
+    `<div class="color-swatch${c===selectedColor?' selected':''}" style="background:${c}" title="${c}" onclick="selectDeptColor('${c}')"></div>`
+  ).join('');
+}
+
+function selectDeptColor(color){
+  _editDeptColor = color;
+  _buildDeptColorSwatches(color);
+}
+
+function renderDepts(){
+  const grid = document.getElementById('deptsGrid');
+  if(!D.departments.length){
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)">
+      <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 12px;display:block;opacity:.4"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <div style="font-weight:600;margin-bottom:4px">No departments defined</div>
+      <div style="font-size:13px">Click <strong>Add Department</strong> to create your first department</div>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = D.departments.map(dept=>{
+    const memberCount = D.members.filter(m=>m.deptId===dept.id).length;
+    const roleCount = D.roles.filter(r=>r.deptId===dept.id).length;
+    const c = dept.color || '#64748b';
+    return `<div class="dept-card" onclick="openEditDept(${dept.id})">
+      <svg class="dept-card-edit" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      <div class="rc-header" style="border-left:4px solid ${c};padding-left:12px">
+        <div style="flex:1;min-width:0">
+          <div class="rc-name">${h(dept.name)}</div>
+          <div class="rc-members" style="margin-top:6px">${memberCount} member${memberCount!==1?'s':''} · ${roleCount} role${roleCount!==1?'s':''}</div>
+        </div>
+        <div style="width:20px;height:20px;border-radius:50%;background:${c};flex-shrink:0"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openAddDept(){
+  _editDeptId = null;
+  _editDeptColor = '#2563eb';
+  document.getElementById('deptModalTitle').textContent = 'Add Department';
+  document.getElementById('deptModalSub').textContent = 'Define a department for your organisation';
+  document.getElementById('dm-name').value = '';
+  document.getElementById('deptDeleteBtn').style.display = 'none';
+  _buildDeptColorSwatches(_editDeptColor);
+  document.getElementById('deptModal').classList.add('open');
+  setTimeout(()=>document.getElementById('dm-name').focus(), 100);
+}
+
+function openEditDept(id){
+  const dept = D.departments.find(d=>d.id===id);
+  if(!dept) return;
+  _editDeptId = id;
+  _editDeptColor = dept.color || '#2563eb';
+  document.getElementById('deptModalTitle').textContent = 'Edit Department';
+  document.getElementById('deptModalSub').textContent = `${D.members.filter(m=>m.deptId===id).length} members · ${D.roles.filter(r=>r.deptId===id).length} roles`;
+  document.getElementById('dm-name').value = dept.name;
+  document.getElementById('deptDeleteBtn').style.display = '';
+  _buildDeptColorSwatches(_editDeptColor);
+  document.getElementById('deptModal').classList.add('open');
+  setTimeout(()=>document.getElementById('dm-name').focus(), 100);
+}
+
+function closeDeptModal(){
+  document.getElementById('deptModal').classList.remove('open');
+  _editDeptId = null;
+}
+
+function saveDept(){
+  const name = document.getElementById('dm-name').value.trim();
+  if(!name){ alert('Please enter a department name.'); return; }
+  if(_editDeptId !== null){
+    const dept = D.departments.find(d=>d.id===_editDeptId);
+    if(dept){ dept.name = name; dept.color = _editDeptColor; }
+    showToast(`Department "${name}" updated.`, 'success');
+  } else {
+    if(!D.nextDeptId) D.nextDeptId = D.departments.reduce((m,d)=>Math.max(m,d.id),0)+1;
+    D.departments.push({id:D.nextDeptId++, name, color:_editDeptColor});
+    showToast(`Department "${name}" created.`, 'success');
+  }
+  saveData();
+  renderDepts();
+  closeDeptModal();
+}
+
+function deleteDept(id){
+  const dept = D.departments.find(d=>d.id===id);
+  if(!dept) return;
+  const memberCount = D.members.filter(m=>m.deptId===id).length;
+  const roleCount = D.roles.filter(r=>r.deptId===id).length;
+  let warn = '';
+  if(memberCount>0) warn += `\n⚠ ${memberCount} member${memberCount!==1?'s':''} assigned to this department will be unassigned.`;
+  if(roleCount>0) warn += `\n⚠ ${roleCount} role${roleCount!==1?'s':''} assigned to this department will be unassigned.`;
+  if(!confirm(`Delete the department "${dept.name}"?${warn}\n\nThis cannot be undone.`)) return;
+  // Unassign members and roles
+  D.members.forEach(m=>{ if(m.deptId===id) m.deptId=null; });
+  D.roles.forEach(r=>{ if(r.deptId===id) r.deptId=null; });
+  D.departments = D.departments.filter(d=>d.id!==id);
+  saveData();
+  renderDepts();
+  closeDeptModal();
+  showToast(`Department "${dept.name}" deleted.`, 'warn');
+}
+
+document.getElementById('deptModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeDeptModal();});
 
 // ═══════════════════════════════════════════════════
 // MATRIX
