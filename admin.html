@@ -1718,8 +1718,12 @@ function saveEditMember(){
   } catch(e){ console.warn('Could not update auth store:', e); }
   saveData();
   logAudit('member_edit','Edited '+name);
-  renderPeople();
   closeEditMember();
+  // Always return to the people grid so the updated role/info is visible
+  document.getElementById('peopleList').style.display='';
+  document.getElementById('personDetail').classList.remove('active');
+  document.getElementById('breadcrumb').innerHTML='<span>People</span>';
+  renderPeople();
   showToast(`${name} updated successfully.`, 'success');
 }
 
@@ -1753,17 +1757,31 @@ async function resetMemberPassword(id){
   if(!m) return;
   const tempPassword = genTempPassword();
   const passwordHash = await sha256(tempPassword);
+  let saved = false;
   try {
     const auth = JSON.parse(localStorage.getItem('sbAuthData')||'null');
     if(auth && auth.users){
-      const u = auth.users.find(x=>x.memberId===id);
+      // Search by memberId first, fall back to email match
+      let u = auth.users.find(x=>x.memberId===id);
+      if(!u && m.email) u = auth.users.find(x=>x.email===m.email.toLowerCase());
       if(u){
         u.passwordHash = passwordHash;
         u.mustChangePassword = true;
-        localStorage.setItem('sbAuthData', JSON.stringify(auth));
+        u.memberId = id; // repair memberId if it was missing
+        saved = true;
+      } else {
+        // No auth entry at all — create one so the member can log in
+        const newUserId = Math.max(0,...auth.users.map(u=>u.id)) + 1;
+        auth.users.push({ id:newUserId, email:m.email.toLowerCase(), passwordHash, name:m.name, role:'employee', memberId:id, mustChangePassword:true });
+        saved = true;
       }
+      localStorage.setItem('sbAuthData', JSON.stringify(auth));
     }
   } catch(e){ console.warn('Could not update auth store:', e); }
+  if(!saved){
+    showToast('Could not update password — auth store missing. Try clearing localStorage and logging in again.','error',8000);
+    return;
+  }
   const role = D.roles.find(r=>r.id===m.roleId);
   const sent = isEmailConfigured();
   if(sent) sendInviteEmail(m.name, m.email, role?.name||'Team Member', tempPassword);
