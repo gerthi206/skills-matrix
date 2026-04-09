@@ -3,222 +3,375 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skills Matrix — Admin</title>
+<title>SkillsBase — Admin</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f1f5f9;color:#0f172a;display:flex;height:100vh;overflow:hidden}
+:root{
+  --primary:#2563eb;--primary-light:#eff6ff;--primary-hover:#1d4ed8;
+  --sidebar-w:240px;--topbar-h:58px;
+  --bg:#f1f5f9;--surface:#fff;--border:#e2e8f0;
+  --text:#0f172a;--muted:#64748b;--subtle:#94a3b8;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 16px rgba(0,0,0,.08);
+  --radius:10px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:14px}
 
-/* SIDEBAR */
-.sidebar{width:220px;min-width:220px;background:#0f172a;display:flex;flex-direction:column;overflow:hidden}
-.sidebar-brand{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.07)}
-.brand-logo{display:flex;align-items:center;gap:10px}
-.brand-icon{width:34px;height:34px;background:#6366f1;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.brand-name{font-size:15px;font-weight:700;color:#fff}
-.brand-sub{font-size:11px;color:#475569;margin-top:1px}
-.sidebar-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
-.nav-group{padding:8px 8px 4px;font-size:10px;font-weight:700;color:#334155;letter-spacing:.08em;text-transform:uppercase}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:#94a3b8;font-size:13.5px;font-weight:500;transition:all .15s;user-select:none}
-.nav-item svg{flex-shrink:0}
-.nav-item:hover{background:rgba(255,255,255,.06);color:#cbd5e1}
-.nav-item.active{background:rgba(99,102,241,.2);color:#818cf8}
-.sidebar-footer{padding:12px 14px;border-top:1px solid rgba(255,255,255,.07)}
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:100}
+.sidebar-brand{padding:0 16px;height:var(--topbar-h);display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.brand-icon{width:32px;height:32px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.3px}
+.brand-name span{color:var(--primary)}
+.sidebar-scroll{flex:1;overflow-y:auto;padding:12px 8px}
+.nav-section{font-size:10px;font-weight:700;color:var(--subtle);letter-spacing:.08em;text-transform:uppercase;padding:10px 10px 4px;margin-top:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:13.5px;font-weight:500;transition:all .15s;user-select:none;position:relative;text-decoration:none}
+.nav-item svg{flex-shrink:0;opacity:.8}
+.nav-item:hover{background:#f8fafc;color:var(--text)}
+.nav-item.active{background:var(--primary-light);color:var(--primary);font-weight:600}
+.nav-item.active svg{opacity:1}
+.nav-item.active::before{content:'';position:absolute;left:-8px;top:6px;bottom:6px;width:3px;background:var(--primary);border-radius:0 2px 2px 0}
+.nav-badge{margin-left:auto;background:#ef4444;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--border)}
 .footer-user{display:flex;align-items:center;gap:10px}
-.footer-avatar{width:32px;height:32px;border-radius:50%;background:#6366f1;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
-.footer-name{font-size:13px;font-weight:600;color:#e2e8f0}
-.footer-role{font-size:11px;color:#64748b}
-.admin-chip{margin-left:auto;background:rgba(239,68,68,.15);color:#f87171;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;border:1px solid rgba(239,68,68,.3)}
+.f-avatar{width:32px;height:32px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.f-name{font-size:13px;font-weight:600;line-height:1.3}
+.f-role{font-size:11px;color:var(--muted)}
+.admin-tag{margin-left:auto;background:#fef2f2;color:#dc2626;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;border:1px solid #fecaca;white-space:nowrap}
 
-/* MAIN */
+/* ── MAIN ── */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 20px;height:60px;display:flex;align-items:center;gap:12px;flex-shrink:0;z-index:50}
-.page-title{font-size:18px;font-weight:700}
+.topbar{height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;z-index:50}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.breadcrumb span{color:var(--text);font-weight:600}
+.breadcrumb-sep{color:var(--subtle)}
 .topbar-spacer{flex:1}
-.search-wrap{display:flex;align-items:center;gap:8px;background:#f1f5f9;border:1.5px solid #e2e8f0;border-radius:8px;padding:7px 12px;width:260px;transition:border-color .15s}
-.search-wrap:focus-within{border-color:#6366f1;background:#fff}
-.search-wrap svg{color:#94a3b8;flex-shrink:0}
-.search-wrap input{border:none;background:none;outline:none;font-size:13.5px;color:#0f172a;width:100%}
-.search-wrap input::placeholder{color:#94a3b8}
-.topbar-link{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;text-decoration:none;transition:all .15s;white-space:nowrap}
-.topbar-link:hover{border-color:#6366f1;color:#6366f1}
+.topbar-actions{display:flex;align-items:center;gap:8px}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;width:240px;transition:all .15s}
+.search-box:focus-within{border-color:var(--primary);background:#fff}
+.search-box svg{color:var(--subtle);flex-shrink:0}
+.search-box input{border:none;background:none;outline:none;font-size:13px;color:var(--text);width:100%}
+.search-box input::placeholder{color:var(--subtle)}
+.icon-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:all .15s}
+.icon-btn:hover{border-color:var(--primary);color:var(--primary)}
+.user-btn{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;transition:all .15s}
+.user-btn:hover{border-color:var(--primary)}
+.topbar-link{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);text-decoration:none;transition:all .15s;white-space:nowrap}
+.topbar-link:hover{border-color:var(--primary);color:var(--primary)}
 
-/* CONTENT */
-.content{flex:1;overflow-y:auto;padding:20px}
+/* ── CONTENT ── */
+.content-area{flex:1;overflow-y:auto;padding:24px}
 .tab-panel{display:none}
-.tab-panel.active{display:block;animation:fadeIn .2s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.panel-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
-.panel-title{font-size:20px;font-weight:700;flex:1}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13.5px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
-.btn-primary{background:#6366f1;color:#fff}
-.btn-primary:hover{background:#4f46e5}
+.tab-panel.active{display:block;animation:fadeIn .18s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── COMMON COMPONENTS ── */
+.page-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:24px}
+.page-header-text h2{font-size:22px;font-weight:700;letter-spacing:-.3px}
+.page-header-text p{font-size:13.5px;color:var(--muted);margin-top:3px}
+.page-header-actions{margin-left:auto;display:flex;gap:8px;align-items:center;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;font-size:13.5px;font-weight:600;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-secondary{background:var(--surface);color:var(--text);border:1.5px solid var(--border)}
+.btn-secondary:hover{border-color:var(--primary);color:var(--primary)}
 .btn-danger{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
 .btn-danger:hover{background:#fee2e2}
-.btn-ghost{background:transparent;color:#64748b;border:1.5px solid #e2e8f0}
-.btn-ghost:hover{border-color:#6366f1;color:#6366f1}
+.btn-sm{padding:6px 12px;font-size:12.5px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.card-title{font-size:15px;font-weight:700;flex:1}
+.card-body{padding:20px}
 
-/* STATS */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px 20px}
+/* ── STATS GRID ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;right:0;width:60px;height:100%;opacity:.06}
 .stat-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
-.stat-icon.blue{background:#eff6ff;color:#3b82f6}
-.stat-icon.green{background:#f0fdf4;color:#22c55e}
-.stat-icon.purple{background:#fdf4ff;color:#9333ea}
-.stat-icon.red{background:#fef2f2;color:#ef4444}
-.stat-value{font-size:28px;font-weight:800;color:#0f172a;line-height:1}
-.stat-label{font-size:12.5px;color:#64748b;margin-top:4px}
+.stat-value{font-size:28px;font-weight:800;letter-spacing:-.5px;line-height:1}
+.stat-label{font-size:12.5px;color:var(--muted);margin-top:4px}
+.stat-trend{font-size:12px;margin-top:6px;display:flex;align-items:center;gap:4px}
+.trend-up{color:#16a34a}.trend-down{color:#dc2626}
 
-/* CHARTS */
-.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.chart-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px}
-.chart-card h3{font-size:15px;font-weight:700;margin-bottom:16px;color:#0f172a}
-.bar-chart{display:flex;flex-direction:column;gap:9px}
-.bar-row{display:flex;align-items:center;gap:10px}
-.bar-lbl{font-size:12.5px;color:#374151;width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar-track{flex:1;height:22px;background:#f1f5f9;border-radius:5px;overflow:hidden}
-.bar-fill{height:100%;border-radius:5px;display:flex;align-items:center;padding:0 8px;min-width:30px;transition:width .4s ease}
+/* ── BAR CHARTS ── */
+.chart-row{display:flex;flex-direction:column;gap:9px}
+.bar-item{display:flex;align-items:center;gap:10px}
+.bar-label{font-size:12.5px;color:var(--text);flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{flex:1;height:20px;background:var(--bg);border-radius:5px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:5px;display:flex;align-items:center;padding:0 8px;transition:width .5s ease;min-width:0}
 .bar-val{font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
+.bar-target{position:absolute;top:0;bottom:0;width:2px;background:rgba(0,0,0,.25)}
 
-/* MATRIX CONTROLS */
-.matrix-controls{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
-.filter-select{padding:7px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;color:#0f172a;background:#fff;cursor:pointer;outline:none;transition:border-color .15s}
-.filter-select:focus{border-color:#6366f1}
-.gaps-toggle{display:flex;align-items:center;gap:8px;padding:7px 14px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;color:#64748b;transition:all .15s;user-select:none}
-.gaps-toggle:hover{border-color:#fca5a5}
+/* ── MATRIX ── */
+.matrix-controls{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.filter-pill{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--border);border-radius:20px;background:var(--surface);cursor:pointer;font-size:12.5px;font-weight:500;color:var(--muted);transition:all .15s;user-select:none}
+.filter-pill:hover{border-color:var(--primary);color:var(--primary)}
+.filter-pill.active{background:var(--primary-light);border-color:var(--primary);color:var(--primary)}
+.filter-select{padding:6px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);background:var(--surface);cursor:pointer;outline:none}
+.filter-select:focus{border-color:var(--primary)}
+.gaps-toggle{display:flex;align-items:center;gap:7px;padding:6px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;font-size:13px;color:var(--muted);transition:all .15s;user-select:none}
 .gaps-toggle.active{background:#fff5f5;border-color:#fca5a5;color:#dc2626}
-.switch{width:32px;height:18px;background:#cbd5e1;border-radius:9px;position:relative;transition:background .15s;flex-shrink:0}
-.switch::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.gaps-toggle.active .switch{background:#ef4444}
-.gaps-toggle.active .switch::after{transform:translateX(14px)}
-.legend{display:flex;gap:8px;align-items:center;margin-left:auto;flex-wrap:wrap}
-.legend-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#64748b}
-.legend-swatch{width:14px;height:14px;border-radius:4px}
-.lv0-bg{background:#f1f5f9}.lv1-bg{background:#fee2e2}.lv2-bg{background:#ffedd5}.lv3-bg{background:#fef9c3}.lv4-bg{background:#dcfce7}.lv5-bg{background:#bbf7d0}
+.sw{width:30px;height:17px;background:#cbd5e1;border-radius:9px;position:relative;transition:background .15s;flex-shrink:0}
+.sw::after{content:'';position:absolute;width:13px;height:13px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.gaps-toggle.active .sw{background:#ef4444}
+.gaps-toggle.active .sw::after{transform:translateX(13px)}
+.view-toggle{display:flex;border:1.5px solid var(--border);border-radius:8px;overflow:hidden}
+.view-btn{padding:6px 12px;background:var(--surface);color:var(--muted);cursor:pointer;font-size:12.5px;border:none;transition:all .15s}
+.view-btn.active{background:var(--primary);color:#fff}
+.matrix-legend{margin-left:auto;display:flex;gap:8px;align-items:center}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+.leg-swatch{width:14px;height:14px;border-radius:3px}
 
-/* MATRIX TABLE */
-.matrix-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden}
+/* Matrix table */
+.matrix-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
 .matrix-scroll{overflow:auto;max-height:calc(100vh - 310px)}
-.matrix-table{border-collapse:collapse;min-width:100%}
-.matrix-table thead tr th{background:#f8fafc;border-bottom:2px solid #e2e8f0;position:sticky;top:0;z-index:20}
-.th-corner{position:sticky;left:0;z-index:30!important;min-width:210px;max-width:210px;padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:#64748b;border-right:1.5px solid #e2e8f0;background:#f8fafc!important}
-.th-skill{min-width:68px;max-width:68px;padding:0 4px 8px;vertical-align:bottom}
-.skill-head-inner{display:flex;flex-direction:column;align-items:center;gap:4px}
-.skill-head-name{writing-mode:vertical-rl;transform:rotate(180deg);font-size:11.5px;font-weight:600;color:#0f172a;white-space:nowrap;max-height:110px;overflow:hidden;text-overflow:ellipsis}
-.cat-pill{font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;text-transform:uppercase;letter-spacing:.03em;writing-mode:vertical-rl;transform:rotate(180deg);margin-top:4px}
-.matrix-table tbody tr{border-bottom:1px solid #f1f5f9;transition:background .1s}
-.matrix-table tbody tr:last-child{border-bottom:none}
-.matrix-table tbody tr:hover{background:#f8fafc}
-.td-member{position:sticky;left:0;background:#fff;border-right:1.5px solid #e2e8f0;padding:8px 14px;z-index:10;min-width:210px;max-width:210px;transition:background .1s}
-.matrix-table tbody tr:hover .td-member{background:#f8fafc}
-.member-wrap{display:flex;align-items:center;gap:10px}
-.m-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
-.m-name{font-size:13.5px;font-weight:600;color:#0f172a}
-.m-role{font-size:11.5px;color:#64748b}
-.td-cell{padding:5px 4px;text-align:center}
-.skill-cell{width:52px;height:36px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;margin:0 auto;cursor:pointer;transition:transform .12s,box-shadow .12s;border:2px solid transparent;position:relative;user-select:none}
-.skill-cell:hover{transform:scale(1.15);box-shadow:0 4px 14px rgba(0,0,0,.15);z-index:50}
+.mtable{border-collapse:collapse;min-width:100%}
+.mtable thead tr th{background:#f8fafc;border-bottom:2px solid var(--border);position:sticky;top:0;z-index:20}
+.th-corner{position:sticky;left:0;z-index:30!important;min-width:220px;max-width:220px;padding:10px 14px;text-align:left;font-size:11.5px;font-weight:700;color:var(--muted);border-right:1.5px solid var(--border);background:#f8fafc!important;text-transform:uppercase;letter-spacing:.04em}
+.th-skill{min-width:64px;max-width:64px;padding:0 3px 8px;vertical-align:bottom}
+.th-skill-inner{display:flex;flex-direction:column;align-items:center;gap:3px}
+.th-skill-name{writing-mode:vertical-rl;transform:rotate(180deg);font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;max-height:100px;overflow:hidden;text-overflow:ellipsis}
+.th-cat-dot{width:6px;height:6px;border-radius:50%;margin-top:3px}
+.mtable tbody tr{border-bottom:1px solid #f1f5f9;transition:background .1s}
+.mtable tbody tr:last-child{border-bottom:none}
+.mtable tbody tr:hover{background:#fafbfc}
+.td-member{position:sticky;left:0;background:var(--surface);border-right:1.5px solid var(--border);padding:8px 14px;z-index:10;min-width:220px;max-width:220px;transition:background .1s}
+.mtable tbody tr:hover .td-member{background:#fafbfc}
+.mem-wrap{display:flex;align-items:center;gap:9px}
+.mem-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
+.mem-name{font-size:13px;font-weight:600;color:var(--text)}
+.mem-role{font-size:11px;color:var(--muted)}
+.td-cell{padding:4px 3px;text-align:center}
+.skill-cell{width:50px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;margin:0 auto;cursor:pointer;transition:transform .12s,box-shadow .12s;border:2px solid transparent;position:relative;user-select:none}
+.skill-cell:hover{transform:scale(1.15);box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:50}
 .skill-cell.gap-cell{border-color:#ef4444}
-.skill-cell.gap-cell::before{content:'!';position:absolute;top:-7px;right:-7px;width:14px;height:14px;background:#ef4444;color:#fff;border-radius:50%;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;z-index:10}
+.skill-cell.gap-cell::before{content:'!';position:absolute;top:-6px;right:-6px;width:13px;height:13px;background:#ef4444;color:#fff;border-radius:50%;font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center;z-index:10}
+/* Interest dot */
+.int-dot{position:absolute;bottom:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--primary);border:1px solid rgba(255,255,255,.6)}
+/* Level colors */
 .lv0{background:#f1f5f9;color:#94a3b8}
 .lv1{background:#fee2e2;color:#dc2626}
 .lv2{background:#ffedd5;color:#ea580c}
 .lv3{background:#fef9c3;color:#ca8a04}
 .lv4{background:#dcfce7;color:#16a34a}
 .lv5{background:#bbf7d0;color:#15803d}
-.avg-row{background:#fafafa!important}
-.avg-row .td-member{background:#fafafa}
-.avg-row:hover{background:#f1f5f9!important}
-.avg-row:hover .td-member{background:#f1f5f9}
-.avg-badge{font-size:10px;background:#e0e7ff;color:#4338ca;padding:2px 6px;border-radius:6px;font-weight:700;display:inline-block;margin-top:2px}
-.avg-cell{width:52px;height:36px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;margin:0 auto}
-.hidden-row{display:none}
+/* Average row */
+.avg-row{background:#f8fafc!important}
+.avg-row .td-member{background:#f8fafc}
+.avg-badge{font-size:9.5px;background:#e0e7ff;color:#4338ca;padding:1px 5px;border-radius:5px;font-weight:700;display:inline-block;margin-top:2px}
+.avg-cell{width:50px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin:0 auto}
+.hidden-row{display:none!important}
 
-/* SUMMARY BAR */
-.summary-bar{background:#0f172a;padding:10px 20px;display:flex;align-items:center;flex-shrink:0}
+/* ── SUMMARY BAR ── */
+.summary-bar{background:#1e293b;padding:9px 20px;display:flex;align-items:center;flex-shrink:0}
 .summary-bar.hidden{display:none}
-.sum-item{display:flex;flex-direction:column;padding:0 20px;border-right:1px solid rgba(255,255,255,.08)}
+.sum-item{display:flex;flex-direction:column;padding:0 18px;border-right:1px solid rgba(255,255,255,.08)}
 .sum-item:first-child{padding-left:0}
 .sum-item:last-child{border-right:none}
-.sum-label{font-size:10px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:.06em}
-.sum-value{font-size:20px;font-weight:800;color:#fff;line-height:1.2}
-.sum-value.good{color:#4ade80}
-.sum-value.warn{color:#fbbf24}
-.sum-value.bad{color:#f87171}
+.sum-label{font-size:9.5px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em}
+.sum-value{font-size:18px;font-weight:800;color:#fff;line-height:1.2}
+.sum-value.good{color:#4ade80}.sum-value.warn{color:#fbbf24}.sum-value.bad{color:#f87171}
 
-/* TOOLTIP */
-.tooltip{position:fixed;background:#0f172a;color:#e2e8f0;padding:10px 13px;border-radius:9px;font-size:12.5px;pointer-events:none;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:220px;display:none}
-.tooltip.visible{display:block}
-.tt-skill{font-weight:700;color:#fff;font-size:13px;margin-bottom:2px}
-.tt-member{color:#64748b;margin-bottom:8px}
-.tt-level-row{display:flex;align-items:center;gap:7px}
-.tt-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.tt-required{margin-top:6px;color:#64748b;font-size:11.5px;border-top:1px solid rgba(255,255,255,.08);padding-top:6px}
-.tt-gap{color:#f87171;font-weight:600;margin-top:4px}
+/* ── TOOLTIP ── */
+.tt{position:fixed;background:#0f172a;color:#e2e8f0;padding:10px 13px;border-radius:9px;font-size:12.5px;pointer-events:none;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3);max-width:230px;display:none}
+.tt.visible{display:block}
+.tt-title{font-weight:700;color:#fff;font-size:13px;margin-bottom:2px}
+.tt-sub{color:#64748b;margin-bottom:8px}
+.tt-row{display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.tt-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.tt-divider{border-top:1px solid rgba(255,255,255,.08);margin:7px 0}
+.tt-gap{color:#f87171;font-weight:600}
+.tt-interest{color:#93c5fd}
+.tt-edit{color:#a5b4fc;font-size:11px;margin-top:4px}
 
-/* EDIT MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
-.modal-overlay.open{display:flex}
-.modal{background:#fff;border-radius:16px;width:420px;max-width:92vw;box-shadow:0 24px 64px rgba(0,0,0,.25);overflow:hidden}
-.modal-header{padding:20px 24px 16px;border-bottom:1px solid #e2e8f0}
+/* ── EDIT MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:14px;width:440px;max-width:93vw;box-shadow:0 24px 64px rgba(0,0,0,.2);overflow:hidden}
+.modal-hdr{padding:20px 22px 16px;border-bottom:1px solid var(--border)}
 .modal-title{font-size:17px;font-weight:700}
-.modal-sub{font-size:13px;color:#64748b;margin-top:2px}
-.modal-body{padding:20px 24px}
-.level-picker{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.lp-btn{padding:12px 8px;border:2px solid #e2e8f0;border-radius:10px;cursor:pointer;text-align:center;background:#fff;transition:all .15s}
-.lp-btn:hover{border-color:#a5b4fc;background:#f5f3ff}
-.lp-num{font-size:22px;font-weight:800}
-.lp-lbl{font-size:10.5px;color:#64748b;margin-top:2px}
-.modal-footer{padding:14px 24px 20px;display:flex;gap:10px}
+.modal-sub{font-size:13px;color:var(--muted);margin-top:2px}
+.modal-body{padding:20px 22px}
+.modal-ftr{padding:14px 22px 20px;display:flex;gap:10px}
+.lp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.lp-btn{padding:11px 8px;border:2px solid var(--border);border-radius:9px;cursor:pointer;text-align:center;background:#fff;transition:all .15s}
+.lp-btn:hover{border-color:#bfdbfe;background:#f0f9ff}
+.lp-num{font-size:20px;font-weight:800}
+.lp-lbl{font-size:10px;color:var(--muted);margin-top:2px}
+.interest-toggle{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg);border-radius:9px;cursor:pointer;user-select:none}
+.it-label{font-size:13.5px;font-weight:600;flex:1}
+.it-desc{font-size:12px;color:var(--muted)}
+.it-switch{width:38px;height:22px;background:#cbd5e1;border-radius:11px;position:relative;transition:background .2s;flex-shrink:0}
+.it-switch.on{background:var(--primary)}
+.it-switch::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.it-switch.on::after{transform:translateX(16px)}
 
-/* TEAM TAB */
-.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
-.member-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px;display:flex;align-items:flex-start;gap:14px}
-.mc-avatar{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
-.mc-name{font-size:15px;font-weight:700}
-.mc-role{font-size:12.5px;color:#64748b;margin-top:2px}
-.mc-stats{display:flex;gap:14px;margin-top:10px}
-.mc-stat .val{font-size:16px;font-weight:700}
-.mc-stat .lbl{font-size:11px;color:#64748b}
+/* ── PEOPLE TAB ── */
+.people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.person-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)}
+.person-card:hover{border-color:var(--primary);box-shadow:0 4px 16px rgba(37,99,235,.12);transform:translateY(-1px)}
+.pc-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.pc-avatar{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;flex-shrink:0}
+.pc-name{font-size:15px;font-weight:700;line-height:1.2}
+.pc-role{font-size:12px;color:var(--muted);margin-top:2px}
+.pc-dept{font-size:11px;background:var(--bg);color:var(--muted);padding:2px 7px;border-radius:6px;display:inline-block;margin-top:4px}
+.pc-stats{display:flex;gap:0;border-top:1px solid var(--border);padding-top:12px}
+.pc-stat{flex:1;text-align:center;border-right:1px solid var(--border)}
+.pc-stat:last-child{border-right:none}
+.pc-stat-val{font-size:18px;font-weight:800;line-height:1}
+.pc-stat-lbl{font-size:10px;color:var(--muted);margin-top:2px}
+.competency-ring{width:48px;height:48px;flex-shrink:0;margin-left:auto;margin-top:-4px}
 
-/* SKILLS TAB */
-.add-form{background:#fff;border:1.5px dashed #e2e8f0;border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
-.form-field{display:flex;flex-direction:column;gap:5px}
-.form-label{font-size:12px;font-weight:600;color:#64748b}
-.form-input,.form-select{padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13.5px;color:#0f172a;background:#fff;outline:none;transition:border-color .15s}
-.form-input:focus,.form-select:focus{border-color:#6366f1}
-.skills-list{display:flex;flex-direction:column;gap:8px}
-.skill-item{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:14px}
-.cat-badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0}
-.skill-name-txt{font-size:14px;font-weight:600;flex:1}
-.req-indicator{display:flex;align-items:center;gap:6px}
-.req-label{font-size:12px;color:#64748b}
+/* ── PERSON DETAIL ── */
+.person-detail{display:none}
+.person-detail.active{display:block;animation:fadeIn .18s ease}
+.person-hdr{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;box-shadow:var(--shadow)}
+.ph-top{display:flex;align-items:center;gap:16px}
+.ph-avatar{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;flex-shrink:0}
+.ph-name{font-size:22px;font-weight:800;letter-spacing:-.3px}
+.ph-meta{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
+.ph-role{font-size:13px;color:var(--muted)}
+.ph-badge{font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600}
+.ph-stats{display:flex;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.ph-stat{display:flex;flex-direction:column;align-items:center;gap:2px}
+.ph-stat-val{font-size:24px;font-weight:800}
+.ph-stat-lbl{font-size:11px;color:var(--muted)}
+
+/* Person tabs */
+.person-tabs{display:flex;gap:2px;background:var(--bg);padding:4px;border-radius:10px;margin-bottom:16px;width:fit-content}
+.ptab{padding:7px 16px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);transition:all .15s;user-select:none}
+.ptab.active{background:var(--surface);color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.ptab-panel{display:none}
+.ptab-panel.active{display:block;animation:fadeIn .15s ease}
+
+/* At a Glance */
+.aag-grid{display:grid;grid-template-columns:auto 1fr 1fr;gap:16px;align-items:start;margin-bottom:16px}
+.aag-ring{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.aag-ring-label{font-size:13px;font-weight:600;color:var(--muted)}
+.aag-mini-cards{display:flex;flex-direction:column;gap:10px}
+.aag-mini{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.aag-mini-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.aag-mini-val{font-size:20px;font-weight:800;line-height:1}
+.aag-mini-lbl{font-size:11px;color:var(--muted);margin-top:1px}
+.skills-lists-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.skills-mini-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.smc-title{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.smc-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f1f5f9}
+.smc-item:last-child{border-bottom:none}
+.smc-name{font-size:13px;font-weight:500;flex:1}
+.smc-lvl{font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px}
+
+/* Competency tab */
+.comp-chart{display:flex;flex-direction:column;gap:10px}
+.comp-row{display:flex;align-items:center;gap:10px}
+.comp-label{font-size:12.5px;color:var(--text);width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.comp-bars{flex:1;display:flex;flex-direction:column;gap:3px}
+.comp-track{height:14px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative}
+.comp-fill-cur{height:100%;border-radius:4px;transition:width .5s ease;display:flex;align-items:center;padding:0 6px}
+.comp-fill-tgt{position:absolute;top:0;bottom:0;width:2px;background:#374151;opacity:.4}
+.comp-vals{display:flex;gap:4px;align-items:center;white-space:nowrap}
+.comp-cur{font-size:12px;font-weight:700}
+.comp-sep{color:var(--subtle);font-size:11px}
+.comp-tgt{font-size:11px;color:var(--muted)}
+.comp-gap-badge{font-size:10px;background:#fef2f2;color:#dc2626;padding:1px 6px;border-radius:4px;font-weight:700}
+
+/* Career tab */
+.career-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.career-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.career-card.best{border-color:#16a34a;background:#f0fdf4}
+.cc-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.cc-role{font-size:14px;font-weight:700;flex:1}
+.cc-dept{font-size:11px;color:var(--muted)}
+.cc-pct{font-size:22px;font-weight:800}
+.cc-bar-track{height:8px;background:var(--bg);border-radius:4px;overflow:hidden}
+.cc-bar-fill{height:100%;border-radius:4px;transition:width .5s ease}
+.cc-missing{margin-top:10px;font-size:11.5px;color:var(--muted)}
+.cc-missing strong{color:var(--text)}
+.best-badge{font-size:10px;background:#dcfce7;color:#15803d;padding:2px 7px;border-radius:6px;font-weight:700}
+
+/* ── ROLES TAB ── */
+.roles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.role-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.rc-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+.rc-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rc-name{font-size:15px;font-weight:700}
+.rc-dept{font-size:12px;color:var(--muted);margin-top:2px}
+.rc-members{font-size:12px;color:var(--primary);margin-top:4px;font-weight:600}
+.rc-skills{display:flex;flex-direction:column;gap:6px}
+.rc-skill-row{display:flex;align-items:center;gap:8px}
+.rc-skill-name{font-size:12.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-skill-req{font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px}
+
+/* ── SKILL LIBRARY ── */
+.skill-cats{display:flex;flex-direction:column;gap:20px}
+.skill-cat-section h3{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.skill-cat-badge{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:700}
+.skill-list{display:flex;flex-direction:column;gap:8px}
+.skill-row{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:13px 16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
+.skill-name-text{font-size:14px;font-weight:600;flex:1}
+.skill-desc{font-size:12px;color:var(--muted);margin-top:2px}
 .req-dots{display:flex;gap:3px}
-.req-dot{width:12px;height:12px;border-radius:50%;background:#e2e8f0}
-.req-dot.on{background:#6366f1}
-.del-btn{width:28px;height:28px;border-radius:6px;border:1px solid #fecaca;background:#fef2f2;color:#dc2626;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s;flex-shrink:0}
+.req-dot{width:11px;height:11px;border-radius:50%;background:var(--border)}
+.req-dot.on{background:var(--primary)}
+.del-btn{width:26px;height:26px;border-radius:6px;border:1px solid #fecaca;background:#fef2f2;color:#dc2626;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s;flex-shrink:0}
 .del-btn:hover{background:#fee2e2}
 
-/* REPORTING TAB */
-.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.report-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px}
-.report-card h3{font-size:15px;font-weight:700;margin-bottom:16px;color:#0f172a}
+/* Add form */
+.add-form{background:var(--surface);border:1.5px dashed var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.ff{display:flex;flex-direction:column;gap:5px}
+.ff label{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.fi,.fs{padding:7px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;color:var(--text);background:var(--surface);outline:none;transition:border-color .15s}
+.fi:focus,.fs:focus{border-color:var(--primary)}
 
-/* SETTINGS TAB */
-.settings-block{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:22px;margin-bottom:14px}
-.settings-block h3{font-size:15px;font-weight:700;margin-bottom:14px}
-.setting-row{display:flex;align-items:center;padding:12px 0;border-bottom:1px solid #f1f5f9}
+/* ── GAP ANALYSIS ── */
+.gap-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.gap-priority-list{display:flex;flex-direction:column;gap:8px}
+.gap-item{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:13px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
+.gap-priority{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.pri-high{background:#fef2f2;color:#dc2626}
+.pri-med{background:#fffbeb;color:#d97706}
+.pri-low{background:#f0fdf4;color:#16a34a}
+.gap-skill-name{font-size:14px;font-weight:600;flex:1}
+.gap-meta{font-size:12px;color:var(--muted);margin-top:1px}
+.gap-count{font-size:12px;font-weight:700;color:#dc2626;background:#fef2f2;padding:3px 9px;border-radius:6px;white-space:nowrap}
+
+/* ── REPORTING ── */
+.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.report-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.report-card h3{font-size:14px;font-weight:700;margin-bottom:16px;color:var(--text)}
+
+/* ── SETTINGS ── */
+.settings-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.settings-block h3{font-size:15px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.setting-row{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid #f8fafc}
 .setting-row:last-child{border-bottom:none}
 .sr-info{flex:1}
 .sr-label{font-size:14px;font-weight:600}
-.sr-desc{font-size:12px;color:#64748b;margin-top:2px}
-.mini-switch{width:38px;height:22px;background:#cbd5e1;border-radius:11px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
-.mini-switch.on{background:#6366f1}
-.mini-switch::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.mini-switch.on::after{transform:translateX(16px)}
+.sr-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.mini-sw{width:36px;height:20px;background:#cbd5e1;border-radius:10px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.mini-sw.on{background:var(--primary)}
+.mini-sw::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.mini-sw.on::after{transform:translateX(16px)}
 
-/* ADD MEMBER FORM */
+/* Add member form */
 .add-member-form{display:flex;flex-direction:column;gap:12px}
 
-/* SCROLLBAR */
+/* Category color helpers */
+.cat-Frontend{background:#dbeafe;color:#1d4ed8}
+.cat-Backend{background:#dcfce7;color:#15803d}
+.cat-DevOps{background:#fef3c7;color:#b45309}
+.cat-SoftSkills{background:#ede9fe;color:#6d28d9}
+.cat-dot-Frontend{background:#2563eb}
+.cat-dot-Backend{background:#16a34a}
+.cat-dot-DevOps{background:#d97706}
+.cat-dot-SoftSkills{background:#9333ea}
+
+/* Dept colors */
+.dept-Engineering{background:#eff6ff;color:#2563eb;border-color:#bfdbfe}
+.dept-Operations{background:#fff7ed;color:#c2410c;border-color:#fed7aa}
+.dept-Product{background:#fdf4ff;color:#7e22ce;border-color:#e9d5ff}
+
+/* Scrollbar */
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
@@ -228,273 +381,326 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <body>
 
 <!-- TOOLTIP -->
-<div class="tooltip" id="tooltip"></div>
+<div class="tt" id="tooltip"></div>
 
 <!-- EDIT MODAL -->
-<div class="modal-overlay" id="editModal">
+<div class="overlay" id="editModal">
   <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="modalTitle">Edit Skill Level</div>
+    <div class="modal-hdr">
+      <div class="modal-title" id="modalTitle">Edit Skill</div>
       <div class="modal-sub" id="modalSub"></div>
     </div>
     <div class="modal-body">
-      <div class="level-picker" id="levelPicker"></div>
+      <div style="font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Proficiency Level</div>
+      <div class="lp-grid" id="levelPicker"></div>
+      <div class="interest-toggle" id="interestToggle" onclick="toggleInterest()">
+        <div>
+          <div class="it-label">Interested in developing this skill</div>
+          <div class="it-desc">Mark if the employee wants to grow in this area</div>
+        </div>
+        <div class="it-switch" id="itSwitch"></div>
+      </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" style="flex:1" onclick="saveLevel()">Save</button>
+    <div class="modal-ftr">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" style="flex:1" onclick="saveSkill()">Save Changes</button>
     </div>
   </div>
 </div>
 
 <!-- ADD MEMBER MODAL -->
-<div class="modal-overlay" id="addMemberModal">
+<div class="overlay" id="addMemberModal">
   <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Add Team Member</div>
-      <div class="modal-sub">Fill in the details below</div>
-    </div>
+    <div class="modal-hdr"><div class="modal-title">Add Team Member</div></div>
     <div class="modal-body">
       <div class="add-member-form">
-        <div class="form-field">
-          <label class="form-label">Full Name</label>
-          <input class="form-input" id="newMemberName" placeholder="e.g. Jane Doe" />
+        <div class="ff"><label>Full Name</label><input class="fi" id="nm-name" placeholder="e.g. Jane Smith"/></div>
+        <div class="ff"><label>Role</label>
+          <select class="fs" id="nm-roleId">
+            <option value="">Select role…</option>
+          </select>
         </div>
-        <div class="form-field">
-          <label class="form-label">Role</label>
-          <input class="form-input" id="newMemberRole" placeholder="e.g. Backend Developer" />
+        <div class="ff"><label>Department</label>
+          <select class="fs" id="nm-deptId">
+            <option value="">Select department…</option>
+          </select>
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="document.getElementById('addMemberModal').classList.remove('open')">Cancel</button>
+    <div class="modal-ftr">
+      <button class="btn btn-secondary" onclick="closeAddMember()">Cancel</button>
       <button class="btn btn-primary" style="flex:1" onclick="addMember()">Add Member</button>
     </div>
   </div>
 </div>
 
-<!-- LAYOUT -->
+<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-brand">
-    <div class="brand-logo">
-      <div class="brand-icon">
-        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      </div>
-      <div>
-        <div class="brand-name">SkillMatrix</div>
-        <div class="brand-sub">Team Intelligence</div>
-      </div>
-    </div>
+    <div class="brand-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+    <div class="brand-name">Skills<span>Base</span></div>
   </div>
-  <nav class="sidebar-nav">
-    <div class="nav-group">Main</div>
+  <div class="sidebar-scroll">
     <div class="nav-item active" data-tab="dashboard" onclick="navTo('dashboard',this)">
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       Dashboard
     </div>
+    <div class="nav-section">Workforce</div>
+    <div class="nav-item" data-tab="people" onclick="navTo('people',this)">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      People
+    </div>
+    <div class="nav-item" data-tab="roles" onclick="navTo('roles',this)">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+      Roles
+    </div>
+    <div class="nav-section">Skills</div>
     <div class="nav-item" data-tab="matrix" onclick="navTo('matrix',this)">
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
       Skills Matrix
     </div>
-    <div class="nav-group" style="margin-top:6px">Manage</div>
-    <div class="nav-item" data-tab="team" onclick="navTo('team',this)">
-      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-      Team
-    </div>
-    <div class="nav-item" data-tab="skills" onclick="navTo('skills',this)">
+    <div class="nav-item" data-tab="library" onclick="navTo('library',this)">
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      Skills
+      Skill Library
     </div>
-    <div class="nav-group" style="margin-top:6px">Insights</div>
-    <div class="nav-item" data-tab="reporting" onclick="navTo('reporting',this)">
+    <div class="nav-section">Insights</div>
+    <div class="nav-item" data-tab="gaps" onclick="navTo('gaps',this)">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Gap Analysis
+    </div>
+    <div class="nav-item" data-tab="reports" onclick="navTo('reports',this)">
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-      Reporting
+      Reports
     </div>
+    <div class="nav-section">Config</div>
     <div class="nav-item" data-tab="settings" onclick="navTo('settings',this)">
       <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       Settings
     </div>
-  </nav>
+  </div>
   <div class="sidebar-footer">
     <div class="footer-user">
-      <div class="footer-avatar">AD</div>
-      <div>
-        <div class="footer-name">Admin</div>
-        <div class="footer-role">Administrator</div>
-      </div>
-      <span class="admin-chip">ADMIN</span>
+      <div class="f-avatar">AD</div>
+      <div><div class="f-name">Admin User</div><div class="f-role">Administrator</div></div>
+      <span class="admin-tag">ADMIN</span>
     </div>
   </div>
 </aside>
 
+<!-- MAIN -->
 <main class="main">
   <header class="topbar">
-    <div class="page-title" id="pageTitle">Dashboard</div>
+    <div class="breadcrumb" id="breadcrumb"><span>Dashboard</span></div>
     <div class="topbar-spacer"></div>
-    <div class="search-wrap" id="topbarSearch" style="display:none">
-      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-      <input type="text" id="searchInput" placeholder="Search name, role, or skill…" oninput="applyFilters()">
+    <div class="topbar-actions">
+      <div class="search-box" id="topSearch" style="display:none">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" placeholder="Search people, skills…" oninput="applyFilters()">
+      </div>
+      <a href="user.html" class="topbar-link">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Employee View
+      </a>
     </div>
-    <a href="user.html" class="topbar-link">
-      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      User View
-    </a>
   </header>
 
-  <div class="content">
+  <div class="content-area" id="contentArea">
+
     <!-- DASHBOARD -->
     <div class="tab-panel active" id="tab-dashboard">
-      <div class="stats-grid" id="dashStats"></div>
-      <div class="charts-row">
-        <div class="chart-card"><h3>Coverage by Category</h3><div id="dashCatChart"></div></div>
-        <div class="chart-card"><h3>Top Skill Gaps</h3><div id="dashGapChart"></div></div>
+      <div class="page-header">
+        <div class="page-header-text"><h2>Dashboard</h2><p>Organisation-wide skills overview</p></div>
       </div>
+      <div class="stats-grid" id="dashStats"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="card"><div class="card-header"><div class="card-title">Coverage by Category</div></div><div class="card-body"><div id="dashCatChart"></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Top Skill Gaps</div></div><div class="card-body"><div id="dashGapChart"></div></div></div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Department Overview</div></div><div class="card-body"><div id="dashDeptChart"></div></div></div>
     </div>
 
-    <!-- MATRIX -->
+    <!-- PEOPLE -->
+    <div class="tab-panel" id="tab-people">
+      <div class="page-header">
+        <div class="page-header-text"><h2>People</h2><p>Manage team members and view individual dashboards</p></div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" onclick="openAddMember()">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Add Member
+          </button>
+        </div>
+      </div>
+      <!-- People list -->
+      <div id="peopleList">
+        <div class="people-grid" id="peopleGrid"></div>
+      </div>
+      <!-- Person detail (shown when a person is selected) -->
+      <div class="person-detail" id="personDetail"></div>
+    </div>
+
+    <!-- ROLES -->
+    <div class="tab-panel" id="tab-roles">
+      <div class="page-header">
+        <div class="page-header-text"><h2>Roles</h2><p>Define skill targets for each role in your organisation</p></div>
+      </div>
+      <div class="roles-grid" id="rolesGrid"></div>
+    </div>
+
+    <!-- SKILLS MATRIX -->
     <div class="tab-panel" id="tab-matrix">
-      <div class="matrix-controls">
-        <select class="filter-select" id="categoryFilter" onchange="applyFilters()">
+      <div class="page-header">
+        <div class="page-header-text"><h2>Skills Matrix</h2><p>Interactive heatmap of team proficiency and interests</p></div>
+        <div class="page-header-actions">
+          <button class="btn btn-secondary btn-sm" onclick="exportCSV()">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
+        </div>
+      </div>
+      <div class="matrix-controls" id="matrixControls">
+        <select class="filter-select" id="catFilter" onchange="applyFilters()">
           <option value="">All Categories</option>
         </select>
+        <select class="filter-select" id="deptFilter" onchange="applyFilters()">
+          <option value="">All Departments</option>
+        </select>
         <div class="gaps-toggle" id="gapsToggle" onclick="toggleGaps()">
-          <div class="switch"></div>
-          Gaps Only
+          <div class="sw"></div> Gaps Only
         </div>
-        <div class="legend">
-          <span style="font-size:11px;color:#64748b;font-weight:600;margin-right:2px">Level:</span>
-          <div class="legend-item"><div class="legend-swatch lv0-bg"></div>0 N/A</div>
-          <div class="legend-item"><div class="legend-swatch lv1-bg"></div>1 Aware</div>
-          <div class="legend-item"><div class="legend-swatch lv2-bg"></div>2 Novice</div>
-          <div class="legend-item"><div class="legend-swatch lv3-bg"></div>3 Dev</div>
-          <div class="legend-item"><div class="legend-swatch lv4-bg"></div>4 Prof</div>
-          <div class="legend-item"><div class="legend-swatch lv5-bg"></div>5 Expert</div>
+        <div class="matrix-legend">
+          <div class="leg-item"><div class="leg-swatch lv0"></div>0</div>
+          <div class="leg-item"><div class="leg-swatch lv1"></div>1</div>
+          <div class="leg-item"><div class="leg-swatch lv2"></div>2</div>
+          <div class="leg-item"><div class="leg-swatch lv3"></div>3</div>
+          <div class="leg-item"><div class="leg-swatch lv4"></div>4</div>
+          <div class="leg-item"><div class="leg-swatch lv5"></div>5</div>
+          <div class="leg-item"><div style="width:8px;height:8px;border-radius:50%;background:#2563eb;border:1px solid #fff"></div>Interest</div>
         </div>
       </div>
-      <div class="matrix-card">
-        <div class="matrix-scroll">
-          <table class="matrix-table" id="matrixTable"></table>
-        </div>
+      <div class="matrix-wrap">
+        <div class="matrix-scroll"><table class="mtable" id="matrixTable"></table></div>
       </div>
     </div>
 
-    <!-- TEAM -->
-    <div class="tab-panel" id="tab-team">
-      <div class="panel-header">
-        <div class="panel-title">Team Members</div>
-        <button class="btn btn-primary" onclick="document.getElementById('addMemberModal').classList.add('open')">
-          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-          Add Member
-        </button>
-      </div>
-      <div class="team-grid" id="teamGrid"></div>
-    </div>
-
-    <!-- SKILLS -->
-    <div class="tab-panel" id="tab-skills">
-      <div class="panel-header">
-        <div class="panel-title">Skills Library</div>
+    <!-- SKILL LIBRARY -->
+    <div class="tab-panel" id="tab-library">
+      <div class="page-header">
+        <div class="page-header-text"><h2>Skill Library</h2><p>Define and manage your organisation's skill framework</p></div>
       </div>
       <div class="add-form">
-        <div class="form-field">
-          <label class="form-label">Skill Name</label>
-          <input class="form-input" id="newSkillName" placeholder="e.g. GraphQL" style="width:170px"/>
-        </div>
-        <div class="form-field">
-          <label class="form-label">Category</label>
-          <select class="form-select" id="newSkillCat" style="width:145px">
+        <div class="ff"><label>Skill Name</label><input class="fi" id="ns-name" placeholder="e.g. GraphQL" style="width:160px"/></div>
+        <div class="ff"><label>Category</label>
+          <select class="fs" id="ns-cat" style="width:140px">
             <option>Frontend</option><option>Backend</option><option>DevOps</option><option>Soft Skills</option>
           </select>
         </div>
-        <div class="form-field">
-          <label class="form-label">Required Level</label>
-          <select class="form-select" id="newSkillReq" style="width:145px">
-            <option value="1">1 — Awareness</option>
-            <option value="2">2 — Novice</option>
-            <option value="3" selected>3 — Developing</option>
-            <option value="4">4 — Proficient</option>
-            <option value="5">5 — Expert</option>
+        <div class="ff"><label>Default Target</label>
+          <select class="fs" id="ns-req" style="width:145px">
+            <option value="1">1 — Awareness</option><option value="2">2 — Novice</option>
+            <option value="3" selected>3 — Intermediate</option><option value="4">4 — Advanced</option><option value="5">5 — Expert</option>
           </select>
         </div>
+        <div class="ff"><label>Description</label><input class="fi" id="ns-desc" placeholder="Brief description…" style="width:220px"/></div>
         <button class="btn btn-primary" onclick="addSkill()">
           <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
           Add Skill
         </button>
       </div>
-      <div class="skills-list" id="skillsList"></div>
+      <div class="skill-cats" id="skillCats"></div>
     </div>
 
-    <!-- REPORTING -->
-    <div class="tab-panel" id="tab-reporting">
-      <div class="panel-header">
-        <div class="panel-title">Reporting</div>
-        <button class="btn btn-ghost" onclick="exportCSV()">
-          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export CSV
-        </button>
+    <!-- GAP ANALYSIS -->
+    <div class="tab-panel" id="tab-gaps">
+      <div class="page-header">
+        <div class="page-header-text"><h2>Gap Analysis</h2><p>Identify and prioritise skill gaps across your team</p></div>
+      </div>
+      <div class="gap-grid">
+        <div class="card"><div class="card-header"><div class="card-title">Critical Gaps by Skill</div><span style="font-size:12px;color:var(--muted)">Skills with most team members below target</span></div><div class="card-body"><div id="gapBySkill"></div></div></div>
+        <div class="card"><div class="card-header"><div class="card-title">Gaps by Member</div><span style="font-size:12px;color:var(--muted)">People with most skill gaps</span></div><div class="card-body"><div id="gapByMember"></div></div></div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Priority Gap List</div></div><div class="card-body"><div class="gap-priority-list" id="gapPriorityList"></div></div></div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="tab-panel" id="tab-reports">
+      <div class="page-header">
+        <div class="page-header-text"><h2>Reports</h2><p>Analyse skills data across your organisation</p></div>
+        <div class="page-header-actions">
+          <button class="btn btn-secondary btn-sm" onclick="exportCSV()">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
+        </div>
       </div>
       <div class="report-grid" id="reportGrid"></div>
     </div>
 
     <!-- SETTINGS -->
     <div class="tab-panel" id="tab-settings">
-      <div class="panel-header"><div class="panel-title">Settings</div></div>
+      <div class="page-header"><div class="page-header-text"><h2>Settings</h2><p>Configure your SkillsBase workspace</p></div></div>
       <div class="settings-block">
-        <h3>Display</h3>
-        <div class="setting-row">
-          <div class="sr-info"><div class="sr-label">Show team average row</div><div class="sr-desc">Display average skill levels at the bottom of the matrix</div></div>
-          <div class="mini-switch" id="s-avgRow" onclick="toggleSetting('avgRow')"></div>
-        </div>
-        <div class="setting-row">
-          <div class="sr-info"><div class="sr-label">Show gap indicators</div><div class="sr-desc">Red border and ! badge on cells below the required level</div></div>
-          <div class="mini-switch" id="s-gapIndicators" onclick="toggleSetting('gapIndicators')"></div>
-        </div>
-        <div class="setting-row">
-          <div class="sr-info"><div class="sr-label">Compact matrix view</div><div class="sr-desc">Use smaller cells to fit more skills on screen</div></div>
-          <div class="mini-switch" id="s-compact" onclick="toggleSetting('compact')"></div>
-        </div>
+        <h3>Matrix Display</h3>
+        <div class="setting-row"><div class="sr-info"><div class="sr-label">Show team average row</div><div class="sr-desc">Display average proficiency per skill at the bottom of the matrix</div></div><div class="mini-sw" id="s-avgRow" onclick="toggleSetting('avgRow')"></div></div>
+        <div class="setting-row"><div class="sr-info"><div class="sr-label">Show gap indicators</div><div class="sr-desc">Red border and badge on cells below role target level</div></div><div class="mini-sw" id="s-gapIndicators" onclick="toggleSetting('gapIndicators')"></div></div>
+        <div class="setting-row"><div class="sr-info"><div class="sr-label">Show interest indicators</div><div class="sr-desc">Blue dot on cells where the employee has marked interest</div></div><div class="mini-sw" id="s-showInterest" onclick="toggleSetting('showInterest')"></div></div>
+      </div>
+      <div class="settings-block">
+        <h3>Assessment</h3>
+        <div class="setting-row"><div class="sr-info"><div class="sr-label">Allow self-assessment</div><div class="sr-desc">Employees can update their own skill levels</div></div><div class="mini-sw" id="s-selfAssess" onclick="toggleSetting('selfAssess')"></div></div>
       </div>
       <div class="settings-block">
         <h3>Data</h3>
-        <div class="setting-row">
-          <div class="sr-info"><div class="sr-label">Reset to sample data</div><div class="sr-desc">Restore original demo data (cannot be undone)</div></div>
-          <button class="btn btn-danger" onclick="resetData()">Reset</button>
-        </div>
+        <div class="setting-row"><div class="sr-info"><div class="sr-label">Reset to sample data</div><div class="sr-desc">Restore all demo data — cannot be undone</div></div><button class="btn btn-danger" onclick="resetData()">Reset Data</button></div>
       </div>
     </div>
-  </div>
+
+  </div><!-- /content-area -->
 
   <div class="summary-bar hidden" id="summaryBar"></div>
 </main>
 
 <script>
-// ── DATA ──────────────────────────────────────────────
-const STORAGE_KEY = 'skillsMatrixData';
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+const SK = 'skillsMatrixData';
 
-const DEFAULT = {
-  members: [
-    {id:1,name:"Alice Johnson",role:"Frontend Lead",initials:"AJ",color:"#6366f1"},
-    {id:2,name:"Bob Smith",role:"Backend Developer",initials:"BS",color:"#8b5cf6"},
-    {id:3,name:"Carol Davis",role:"Full Stack Dev",initials:"CD",color:"#ec4899"},
-    {id:4,name:"David Lee",role:"DevOps Engineer",initials:"DL",color:"#f97316"},
-    {id:5,name:"Eva Martinez",role:"QA Engineer",initials:"EM",color:"#14b8a6"},
-    {id:6,name:"Frank Wilson",role:"Backend Developer",initials:"FW",color:"#f43f5e"},
+const DEF = {
+  members:[
+    {id:1,name:"Alice Johnson",roleId:1,deptId:1,managerId:null,initials:"AJ",color:"#6366f1",email:"alice@company.com"},
+    {id:2,name:"Bob Smith",roleId:2,deptId:1,managerId:1,initials:"BS",color:"#8b5cf6",email:"bob@company.com"},
+    {id:3,name:"Carol Davis",roleId:3,deptId:1,managerId:1,initials:"CD",color:"#ec4899",email:"carol@company.com"},
+    {id:4,name:"David Lee",roleId:4,deptId:2,managerId:null,initials:"DL",color:"#f97316",email:"david@company.com"},
+    {id:5,name:"Eva Martinez",roleId:5,deptId:2,managerId:4,initials:"EM",color:"#14b8a6",email:"eva@company.com"},
+    {id:6,name:"Frank Wilson",roleId:2,deptId:1,managerId:1,initials:"FW",color:"#f43f5e",email:"frank@company.com"},
   ],
-  skills: [
-    {id:1,name:"React",category:"Frontend",required:4},
-    {id:2,name:"TypeScript",category:"Frontend",required:3},
-    {id:3,name:"CSS / Tailwind",category:"Frontend",required:3},
-    {id:4,name:"Node.js",category:"Backend",required:3},
-    {id:5,name:"Python",category:"Backend",required:2},
-    {id:6,name:"SQL",category:"Backend",required:4},
-    {id:7,name:"REST APIs",category:"Backend",required:4},
-    {id:8,name:"Docker",category:"DevOps",required:3},
-    {id:9,name:"CI / CD",category:"DevOps",required:2},
-    {id:10,name:"AWS",category:"DevOps",required:2},
-    {id:11,name:"Git",category:"DevOps",required:4},
-    {id:12,name:"Communication",category:"Soft Skills",required:3},
-    {id:13,name:"Leadership",category:"Soft Skills",required:2},
-    {id:14,name:"Agile / Scrum",category:"Soft Skills",required:3},
+  departments:[
+    {id:1,name:"Engineering",color:"#2563eb"},
+    {id:2,name:"Operations",color:"#c2410c"},
+    {id:3,name:"Product",color:"#7e22ce"},
+  ],
+  roles:[
+    {id:1,name:"Frontend Lead",deptId:1,targets:{"1":4,"2":4,"3":3,"11":4,"12":3,"13":3,"14":3}},
+    {id:2,name:"Backend Developer",deptId:1,targets:{"4":4,"5":3,"6":4,"7":4,"8":2,"9":2,"11":4,"12":3,"14":3}},
+    {id:3,name:"Full Stack Dev",deptId:1,targets:{"1":3,"2":3,"4":4,"6":3,"7":4,"11":4,"12":3,"14":3}},
+    {id:4,name:"DevOps Engineer",deptId:2,targets:{"8":5,"9":4,"10":4,"11":5,"4":2,"12":3,"14":3}},
+    {id:5,name:"QA Engineer",deptId:2,targets:{"6":3,"7":3,"11":4,"12":4,"14":4,"5":2}},
+  ],
+  skills:[
+    {id:1,name:"React",category:"Frontend",required:4,description:"Component-based UI development"},
+    {id:2,name:"TypeScript",category:"Frontend",required:3,description:"Typed JavaScript superset"},
+    {id:3,name:"CSS / Tailwind",category:"Frontend",required:3,description:"Styling and design systems"},
+    {id:4,name:"Node.js",category:"Backend",required:3,description:"Server-side JavaScript runtime"},
+    {id:5,name:"Python",category:"Backend",required:2,description:"General-purpose scripting and ML"},
+    {id:6,name:"SQL",category:"Backend",required:4,description:"Relational database querying"},
+    {id:7,name:"REST APIs",category:"Backend",required:4,description:"API design and integration"},
+    {id:8,name:"Docker",category:"DevOps",required:3,description:"Container management"},
+    {id:9,name:"CI / CD",category:"DevOps",required:2,description:"Automated build and deployment"},
+    {id:10,name:"AWS",category:"DevOps",required:2,description:"Cloud infrastructure"},
+    {id:11,name:"Git",category:"DevOps",required:4,description:"Version control"},
+    {id:12,name:"Communication",category:"Soft Skills",required:3,description:"Written and verbal communication"},
+    {id:13,name:"Leadership",category:"Soft Skills",required:2,description:"Team guidance and mentoring"},
+    {id:14,name:"Agile / Scrum",category:"Soft Skills",required:3,description:"Agile methodologies"},
   ],
   matrix:{
     "1-1":5,"1-2":4,"1-3":5,"1-4":2,"1-5":1,"1-6":2,"1-7":3,"1-8":1,"1-9":2,"1-10":1,"1-11":4,"1-12":4,"1-13":3,"1-14":4,
@@ -504,140 +710,487 @@ const DEFAULT = {
     "5-1":3,"5-2":3,"5-3":3,"5-4":2,"5-5":2,"5-6":3,"5-7":3,"5-8":1,"5-9":2,"5-10":1,"5-11":4,"5-12":4,"5-13":2,"5-14":5,
     "6-1":2,"6-2":2,"6-3":1,"6-4":4,"6-5":5,"6-6":4,"6-7":4,"6-8":2,"6-9":3,"6-10":2,"6-11":4,"6-12":2,"6-13":1,"6-14":2,
   },
-  settings:{avgRow:true,gapIndicators:true,compact:false},
-  nextMemberId:7,
-  nextSkillId:15,
-  currentUserId:3,
+  interests:{
+    "1-1":true,"1-3":true,"1-12":true,"1-13":true,
+    "2-4":true,"2-6":true,"2-8":true,
+    "3-1":true,"3-4":true,"3-7":true,"3-8":true,"3-10":true,
+    "4-9":true,"4-10":true,
+    "5-6":true,"5-7":true,"5-12":true,
+    "6-5":true,"6-6":true,"6-7":true,
+  },
+  settings:{avgRow:true,gapIndicators:true,showInterest:true,selfAssess:true},
+  nextMemberId:7,nextSkillId:15,currentUserId:3,
 };
 
-let D = null;
+let D=null;
+function loadData(){try{const s=localStorage.getItem(SK);D=s?JSON.parse(s):null;}catch(e){D=null;}if(!D)resetToDefault();}
+function saveData(){localStorage.setItem(SK,JSON.stringify(D));}
+function resetToDefault(){D=JSON.parse(JSON.stringify(DEF));saveData();}
+function resetData(){if(confirm('Reset all data to sample defaults?')){resetToDefault();location.reload();}}
 
-function loadData(){
-  try{ const s=localStorage.getItem(STORAGE_KEY); D=s?JSON.parse(s):null; }catch(e){D=null;}
-  if(!D) resetToDefault();
-}
-function saveData(){ localStorage.setItem(STORAGE_KEY,JSON.stringify(D)); }
-function resetToDefault(){ D=JSON.parse(JSON.stringify(DEFAULT)); saveData(); }
-function resetData(){ if(confirm('Reset all data to sample defaults?')){ resetToDefault(); location.reload(); } }
-
-// ── LEVELS ────────────────────────────────────────────
-const LV = {
+// ═══════════════════════════════════════════════════
+// LEVEL CONFIG
+// ═══════════════════════════════════════════════════
+const LV={
   0:{label:"Not Assessed",color:"#94a3b8",bg:"#f1f5f9"},
   1:{label:"Awareness",color:"#dc2626",bg:"#fee2e2"},
   2:{label:"Novice",color:"#ea580c",bg:"#ffedd5"},
-  3:{label:"Developing",color:"#ca8a04",bg:"#fef9c3"},
-  4:{label:"Proficient",color:"#16a34a",bg:"#dcfce7"},
+  3:{label:"Intermediate",color:"#ca8a04",bg:"#fef9c3"},
+  4:{label:"Advanced",color:"#16a34a",bg:"#dcfce7"},
   5:{label:"Expert",color:"#15803d",bg:"#bbf7d0"},
 };
-const CAT_CLR = {
-  "Frontend":{bg:"#dbeafe",text:"#1d4ed8"},
-  "Backend":{bg:"#dcfce7",text:"#15803d"},
-  "DevOps":{bg:"#fef3c7",text:"#b45309"},
-  "Soft Skills":{bg:"#ede9fe",text:"#6d28d9"},
+const CAT={
+  "Frontend":{bg:"#dbeafe",text:"#1d4ed8",dot:"#2563eb"},
+  "Backend":{bg:"#dcfce7",text:"#15803d",dot:"#16a34a"},
+  "DevOps":{bg:"#fef3c7",text:"#b45309",dot:"#d97706"},
+  "Soft Skills":{bg:"#ede9fe",text:"#6d28d9",dot:"#9333ea"},
 };
+function getCatKey(cat){return cat.replace(/\s+/g,'');}
+function getLevel(mId,sId){return D.matrix[`${mId}-${sId}`]??0;}
+function setLevel(mId,sId,lv){D.matrix[`${mId}-${sId}`]=lv;saveData();}
+function getInterest(mId,sId){return !!D.interests[`${mId}-${sId}`];}
+function setInterest(mId,sId,v){if(v)D.interests[`${mId}-${sId}`]=true;else delete D.interests[`${mId}-${sId}`];saveData();}
+function getRoleTarget(m,sId){const r=D.roles.find(x=>x.id===m.roleId);return r?parseInt(r.targets[String(sId)]||0):0;}
+function getMemberRole(m){return D.roles.find(r=>r.id===m.roleId);}
+function getMemberDept(m){return D.departments.find(d=>d.id===m.deptId);}
 
-function getLevel(mId,sId){ return D.matrix[`${mId}-${sId}`]??0; }
-function setLevel(mId,sId,lv){ D.matrix[`${mId}-${sId}`]=lv; saveData(); }
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+let activeTab='dashboard',gapsOnly=false,editTarget=null,selLevel=null,selInterest=false;
 
-// ── STATE ─────────────────────────────────────────────
-let activeTab='dashboard', gapsOnly=false, editTarget=null, selLevel=null;
-
-// ── NAVIGATION ────────────────────────────────────────
-const TAB_TITLES = {dashboard:'Dashboard',matrix:'Skills Matrix',team:'Team',skills:'Skills Library',reporting:'Reporting',settings:'Settings'};
+// ═══════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════
+const TITLES={dashboard:'Dashboard',people:'People',roles:'Roles',matrix:'Skills Matrix',library:'Skill Library',gaps:'Gap Analysis',reports:'Reports',settings:'Settings'};
 
 function navTo(tab,el){
   activeTab=tab;
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  el.classList.add('active');
+  if(el) el.classList.add('active');
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById(`tab-${tab}`).classList.add('active');
-  document.getElementById('pageTitle').textContent=TAB_TITLES[tab]||tab;
-  document.getElementById('topbarSearch').style.display=(tab==='matrix')?'flex':'none';
+  document.getElementById('breadcrumb').innerHTML=`<span>${TITLES[tab]||tab}</span>`;
+  document.getElementById('topSearch').style.display=(tab==='matrix'||tab==='people')?'flex':'none';
   document.getElementById('summaryBar').classList.toggle('hidden',tab!=='matrix');
+  // Reset person detail
+  if(tab==='people'){document.getElementById('peopleList').style.display='';document.getElementById('personDetail').classList.remove('active');}
   if(tab==='dashboard') renderDashboard();
-  if(tab==='matrix'){ populateCategoryFilter(); renderMatrix(); }
-  if(tab==='team') renderTeam();
-  if(tab==='skills') renderSkills();
-  if(tab==='reporting') renderReporting();
+  if(tab==='people') renderPeople();
+  if(tab==='roles') renderRoles();
+  if(tab==='matrix'){populateFilters();renderMatrix();}
+  if(tab==='library') renderLibrary();
+  if(tab==='gaps') renderGaps();
+  if(tab==='reports') renderReports();
   if(tab==='settings') renderSettings();
 }
 
-// ── MATRIX ────────────────────────────────────────────
-function populateCategoryFilter(){
+// ═══════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════
+function renderDashboard(){
+  const members=D.members,skills=D.skills;
+  let assessed=0,meetReq=0,totalLv=0,withGaps=0;
+  const total=members.length*skills.length;
+  for(const m of members){
+    let hasGap=false;
+    for(const s of skills){
+      const lv=getLevel(m.id,s.id),tgt=getRoleTarget(m,s.id)||s.required;
+      if(lv>0) assessed++;
+      if(tgt&&lv>=tgt) meetReq++;
+      else if(tgt) hasGap=true;
+      totalLv+=lv;
+    }
+    if(hasGap) withGaps++;
+  }
+  const covPct=total?Math.round(assessed/total*100):0;
+  const reqPct=total?Math.round(meetReq/total*100):0;
+  const avgLv=total?(totalLv/total).toFixed(1):'0.0';
+  const totalInterests=Object.keys(D.interests).length;
+
+  document.getElementById('dashStats').innerHTML=`
+    <div class="stat-card"><div class="stat-icon" style="background:#eff6ff;color:#2563eb"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><div class="stat-value">${members.length}</div><div class="stat-label">Team Members</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#f0fdf4;color:#16a34a"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div class="stat-value" style="color:#16a34a">${reqPct}%</div><div class="stat-label">Meeting Role Targets</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#fef2f2;color:#dc2626"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="stat-value" style="color:#dc2626">${withGaps}</div><div class="stat-label">Members with Gaps</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#eff6ff;color:#2563eb"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div><div class="stat-value">${totalInterests}</div><div class="stat-label">Interest Signals</div></div>
+  `;
+
+  // Category coverage
+  const cats=[...new Set(skills.map(s=>s.category))];
+  const catBars=cats.map(cat=>{
+    const cs=skills.filter(s=>s.category===cat);
+    let meet=0,tot=0;
+    for(const m of members) for(const s of cs){const tgt=getRoleTarget(m,s.id)||s.required;if(tgt){tot++;if(getLevel(m.id,s.id)>=tgt)meet++;}}
+    const pct=tot?Math.round(meet/tot*100):0;
+    const cc=CAT[cat]||{text:'#64748b'};
+    return barRow(cat,pct,`${pct}%`,cc.text,100);
+  }).join('');
+  document.getElementById('dashCatChart').innerHTML=`<div class="chart-row">${catBars}</div>`;
+
+  // Top gaps
+  const gapData=skills.map(s=>({s,gaps:members.filter(m=>{const tgt=getRoleTarget(m,s.id)||s.required;return tgt&&getLevel(m.id,s.id)<tgt;}).length})).sort((a,b)=>b.gaps-a.gaps).slice(0,8);
+  document.getElementById('dashGapChart').innerHTML=`<div class="chart-row">${gapData.map(({s,gaps})=>barRow(s.name,gaps,`${gaps} members`,'#ef4444',members.length)).join('')}</div>`;
+
+  // Dept overview
+  const depts=D.departments;
+  const deptBars=depts.map(dept=>{
+    const dms=members.filter(m=>m.deptId===dept.id);
+    if(!dms.length) return '';
+    let meetCount=0,totalCount=0;
+    for(const m of dms) for(const s of skills){const tgt=getRoleTarget(m,s.id)||s.required;if(tgt){totalCount++;if(getLevel(m.id,s.id)>=tgt)meetCount++;}}
+    const pct=totalCount?Math.round(meetCount/totalCount*100):0;
+    return barRow(`${dept.name} (${dms.length})`,pct,`${pct}%`,dept.color,100);
+  }).filter(Boolean).join('');
+  document.getElementById('dashDeptChart').innerHTML=`<div class="chart-row">${deptBars}</div>`;
+}
+
+function barRow(label,val,dispVal,color,max){
+  const pct=max?Math.max(val/max*100,val>0?5:0):0;
+  return `<div class="bar-item"><div class="bar-label" style="width:140px" title="${h(label)}">${h(label)}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"><span class="bar-val">${h(String(dispVal))}</span></div></div></div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// SVG DONUT CHART
+// ═══════════════════════════════════════════════════
+function donutChart(pct,color,size=90,strokeW=9){
+  const r=(size-strokeW*2)/2,cx=size/2,cy=size/2,c=2*Math.PI*r;
+  const fill=c*Math.min(pct,100)/100;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#f1f5f9" stroke-width="${strokeW}"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${strokeW}"
+      stroke-dasharray="${fill} ${c}" stroke-linecap="round"
+      transform="rotate(-90 ${cx} ${cy})" style="transition:stroke-dasharray .5s ease"/>
+    <text x="${cx}" y="${cy-4}" text-anchor="middle" dominant-baseline="middle" font-size="16" font-weight="800" fill="#0f172a">${pct}%</text>
+    <text x="${cx}" y="${cy+12}" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#64748b">competency</text>
+  </svg>`;
+}
+
+// ═══════════════════════════════════════════════════
+// PEOPLE
+// ═══════════════════════════════════════════════════
+function renderPeople(){
+  const search=(document.getElementById('searchInput')?.value||'').toLowerCase();
+  const members=D.members.filter(m=>!search||m.name.toLowerCase().includes(search)||getMemberRole(m)?.name.toLowerCase().includes(search));
+  document.getElementById('peopleGrid').innerHTML=members.map(m=>{
+    const role=getMemberRole(m),dept=getMemberDept(m);
+    const skills=D.skills;
+    let atTarget=0,gaps=0,totalLv=0;
+    for(const s of skills){
+      const lv=getLevel(m.id,s.id),tgt=getRoleTarget(m,s.id)||s.required;
+      totalLv+=lv;
+      if(tgt){if(lv>=tgt)atTarget++;else gaps++;}
+    }
+    const compPct=skills.length?Math.round(atTarget/(skills.length)*100):0;
+    const avgLv=skills.length?(totalLv/skills.length).toFixed(1):'0';
+    const deptColor=dept?.color||'#64748b';
+    return `<div class="person-card" onclick="openPerson(${m.id})">
+      <div class="pc-top">
+        <div class="pc-avatar" style="background:${m.color}">${h(m.initials)}</div>
+        <div style="flex:1">
+          <div class="pc-name">${h(m.name)}</div>
+          <div class="pc-role">${h(role?.name||'No role')}</div>
+          ${dept?`<div class="pc-dept" style="background:${deptColor}18;color:${deptColor}">${h(dept.name)}</div>`:''}
+        </div>
+        <div class="competency-ring">${donutChart(compPct,compPct>=70?'#16a34a':compPct>=50?'#ca8a04':'#dc2626',72,7)}</div>
+      </div>
+      <div class="pc-stats">
+        <div class="pc-stat"><div class="pc-stat-val">${avgLv}</div><div class="pc-stat-lbl">Avg Level</div></div>
+        <div class="pc-stat"><div class="pc-stat-val" style="color:#16a34a">${atTarget}</div><div class="pc-stat-lbl">At Target</div></div>
+        <div class="pc-stat"><div class="pc-stat-val" style="color:${gaps>0?'#dc2626':'#16a34a'}">${gaps}</div><div class="pc-stat-lbl">Gaps</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openPerson(mId){
+  const m=D.members.find(x=>x.id===mId);
+  if(!m) return;
+  const role=getMemberRole(m),dept=getMemberDept(m);
+  const skills=D.skills;
+  // Calc stats
+  let atTarget=0,gaps=0,totalLv=0,totalInterest=0;
+  for(const s of skills){
+    const lv=getLevel(m.id,s.id),tgt=getRoleTarget(m,s.id)||s.required;
+    totalLv+=lv;
+    if(tgt){if(lv>=tgt)atTarget++;else gaps++;}
+    if(getInterest(m.id,s.id)) totalInterest++;
+  }
+  const compPct=skills.length?Math.round(atTarget/skills.length*100):0;
+  const avgLv=skills.length?(totalLv/skills.length).toFixed(1):'0';
+  const deptColor=dept?.color||'#64748b';
+
+  document.getElementById('peopleList').style.display='none';
+  const nav=document.querySelector(`.nav-item[data-tab="people"]`);
+  document.getElementById('breadcrumb').innerHTML=`<a href="#" onclick="backToPeople()" style="color:var(--primary);text-decoration:none">People</a> <span class="breadcrumb-sep">/</span> <span>${h(m.name)}</span>`;
+
+  // Keen to improve: interest > proficiency
+  const keen=skills.filter(s=>getInterest(m.id,s.id)&&getLevel(m.id,s.id)<(getRoleTarget(m,s.id)||s.required)).sort((a,b)=>getLevel(m.id,a.id)-getLevel(m.id,b.id)).slice(0,5);
+  // Top skills: highest proficiency
+  const top=[...skills].sort((a,b)=>getLevel(m.id,b.id)-getLevel(m.id,a.id)).slice(0,5);
+
+  const detail=document.getElementById('personDetail');
+  detail.innerHTML=`
+    <div class="person-hdr">
+      <div class="ph-top">
+        <div class="ph-avatar" style="background:${m.color}">${h(m.initials)}</div>
+        <div style="flex:1">
+          <div class="ph-name">${h(m.name)}</div>
+          <div class="ph-meta">
+            <span class="ph-role">${h(role?.name||'—')}</span>
+            ${dept?`<span class="ph-badge" style="background:${deptColor}18;color:${deptColor}">${h(dept.name)}</span>`:''}
+            <span style="font-size:12px;color:var(--muted)">${h(m.email||'')}</span>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="backToPeople()">← Back to People</button>
+      </div>
+      <div class="ph-stats">
+        <div class="ph-stat" style="align-items:center">${donutChart(compPct,compPct>=70?'#16a34a':compPct>=50?'#ca8a04':'#dc2626')}<div class="ph-stat-lbl">Competency</div></div>
+        <div class="ph-stat"><div class="ph-stat-val">${avgLv}</div><div class="ph-stat-lbl">Avg Level</div></div>
+        <div class="ph-stat"><div class="ph-stat-val" style="color:#16a34a">${atTarget}</div><div class="ph-stat-lbl">At Target</div></div>
+        <div class="ph-stat"><div class="ph-stat-val" style="color:${gaps>0?'#dc2626':'#16a34a'}">${gaps}</div><div class="ph-stat-lbl">Gaps</div></div>
+        <div class="ph-stat"><div class="ph-stat-val" style="color:#2563eb">${totalInterest}</div><div class="ph-stat-lbl">Interests</div></div>
+      </div>
+    </div>
+    <div class="person-tabs">
+      <div class="ptab active" onclick="switchPTab('overview',this)">Overview</div>
+      <div class="ptab" onclick="switchPTab('skills',this)">Skills</div>
+      <div class="ptab" onclick="switchPTab('competency',this)">Competency</div>
+      <div class="ptab" onclick="switchPTab('career',this)">Career</div>
+    </div>
+    <div class="ptab-panel active" id="ptab-overview">
+      <div class="aag-grid">
+        <div class="aag-ring">
+          ${donutChart(compPct,compPct>=70?'#16a34a':compPct>=50?'#ca8a04':'#dc2626',110,10)}
+          <div class="aag-ring-label">Overall Competency</div>
+        </div>
+        <div class="aag-mini-cards">
+          <div class="aag-mini"><div class="aag-mini-icon" style="background:#eff6ff;color:#2563eb"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div><div><div class="aag-mini-val">${avgLv}</div><div class="aag-mini-lbl">Average Skill Level</div></div></div>
+          <div class="aag-mini"><div class="aag-mini-icon" style="background:#ede9fe;color:#7c3aed"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div><div class="aag-mini-val" style="color:#7c3aed">${totalInterest}</div><div class="aag-mini-lbl">Skills of Interest</div></div></div>
+        </div>
+        <div class="aag-mini-cards">
+          <div class="aag-mini"><div class="aag-mini-icon" style="background:#f0fdf4;color:#16a34a"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="aag-mini-val" style="color:#16a34a">${atTarget}</div><div class="aag-mini-lbl">Skills at Target</div></div></div>
+          <div class="aag-mini"><div class="aag-mini-icon" style="background:#fef2f2;color:#dc2626"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div><div class="aag-mini-val" style="color:#dc2626">${gaps}</div><div class="aag-mini-lbl">Skill Gaps</div></div></div>
+        </div>
+      </div>
+      <div class="skills-lists-row">
+        <div class="skills-mini-card">
+          <div class="smc-title"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Top Skills</div>
+          ${top.map(s=>{const lv=getLevel(m.id,s.id);const info=LV[lv];return `<div class="smc-item"><div class="smc-name">${h(s.name)}</div><span class="smc-lvl" style="background:${info.bg};color:${info.color}">${lv} — ${info.label}</span></div>`;}).join('')}
+        </div>
+        <div class="skills-mini-card">
+          <div class="smc-title"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#2563eb" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Keen to Improve</div>
+          ${keen.length?keen.map(s=>{const lv=getLevel(m.id,s.id);const info=LV[lv];const tgt=getRoleTarget(m,s.id)||s.required;return `<div class="smc-item"><div class="smc-name">${h(s.name)}</div><span class="smc-lvl" style="background:${info.bg};color:${info.color}">${lv}→${tgt}</span></div>`;}).join(''):'<div style="font-size:13px;color:var(--muted);padding:8px 0">No gaps with interest marked</div>'}
+        </div>
+      </div>
+    </div>
+    <div class="ptab-panel" id="ptab-skills">
+      <div class="card"><div class="card-body"><div class="comp-chart">${skills.map(s=>{
+        const lv=getLevel(m.id,s.id),tgt=getRoleTarget(m,s.id)||s.required;
+        const info=LV[lv];const isGap=tgt&&lv<tgt;const cc=CAT[s.category]||{bg:'#f1f5f9',text:'#64748b'};
+        const hasInt=getInterest(m.id,s.id);
+        return `<div class="comp-row">
+          <div class="comp-label" title="${h(s.name)}">${h(s.name)}${hasInt?'<span title="Interested" style="margin-left:4px;color:#2563eb">●</span>':''}</div>
+          <div class="comp-bars" style="flex:1">
+            <div class="comp-track">
+              <div class="comp-fill-cur" style="width:${lv/5*100}%;background:${info.color}"></div>
+              ${tgt?`<div class="comp-fill-tgt" style="left:${tgt/5*100}%"></div>`:''}
+            </div>
+          </div>
+          <div class="comp-vals">
+            <span class="comp-cur" style="color:${info.color}">${lv}</span>
+            <span class="comp-sep">/</span>
+            <span class="comp-tgt">${tgt||'—'}</span>
+            ${isGap?`<span class="comp-gap-badge">-${tgt-lv}</span>`:''}
+          </div>
+          <span class="cat-badge ${getCatKey(s.category)}" style="font-size:10px;padding:1px 7px;border-radius:8px;margin-left:6px">${h(s.category)}</span>
+        </div>`;
+      }).join('')}</div></div></div>
+    </div>
+    <div class="ptab-panel" id="ptab-competency">
+      <div class="card"><div class="card-header"><div class="card-title">Proficiency vs Target</div><span style="font-size:12px;color:var(--muted)">Dark line = role target</span></div><div class="card-body">
+        <div class="comp-chart">${skills.filter(s=>getRoleTarget(m,s.id)).map(s=>{
+          const lv=getLevel(m.id,s.id),tgt=getRoleTarget(m,s.id);
+          const info=LV[lv];const isGap=lv<tgt;
+          return `<div class="comp-row">
+            <div class="comp-label">${h(s.name)}</div>
+            <div class="comp-bars" style="flex:1">
+              <div class="comp-track" style="height:18px">
+                <div class="comp-fill-cur" style="width:${lv/5*100}%;background:${isGap?'#ef4444':info.color}"></div>
+                <div class="comp-fill-tgt" style="left:${tgt/5*100}%"></div>
+              </div>
+            </div>
+            <div class="comp-vals">
+              <span class="comp-cur" style="color:${isGap?'#dc2626':info.color}">${lv}</span>
+              <span class="comp-sep">/</span>
+              <span class="comp-tgt">${tgt}</span>
+              ${isGap?`<span class="comp-gap-badge">gap ${tgt-lv}</span>`:'<span style="font-size:10px;color:#16a34a;background:#f0fdf4;padding:1px 6px;border-radius:4px;font-weight:700">✓</span>'}
+            </div>
+          </div>`;
+        }).join('')}</div>
+      </div></div>
+    </div>
+    <div class="ptab-panel" id="ptab-career">
+      <div style="font-size:13.5px;color:var(--muted);margin-bottom:16px">Career mobility — how well ${h(m.name.split(' ')[0])}'s current skills match each role's targets.</div>
+      <div class="career-grid">${buildCareerCards(m)}</div>
+    </div>
+  `;
+  detail.classList.add('active');
+}
+
+function buildCareerCards(m){
+  const fits=D.roles.map(role=>{
+    const tgtKeys=Object.keys(role.targets);
+    if(!tgtKeys.length) return null;
+    let met=0;
+    const missing=[];
+    for(const sId of tgtKeys){
+      const tgt=parseInt(role.targets[sId]);
+      const lv=getLevel(m.id,parseInt(sId));
+      if(lv>=tgt) met++;
+      else{const s=D.skills.find(x=>x.id===parseInt(sId));if(s)missing.push({s,lv,tgt});}
+    }
+    const pct=Math.round(met/tgtKeys.length*100);
+    const isCurrent=role.id===m.roleId;
+    return {role,pct,missing,isCurrent};
+  }).filter(Boolean).sort((a,b)=>b.pct-a.pct);
+
+  const best=fits[0];
+  return fits.map(({role,pct,missing,isCurrent})=>{
+    const barColor=pct>=80?'#16a34a':pct>=60?'#ca8a04':'#dc2626';
+    const isBest=role===best.role&&!isCurrent;
+    const dept=D.departments.find(d=>d.id===role.deptId);
+    return `<div class="career-card${isBest?' best':''}">
+      <div class="cc-top">
+        <div>
+          <div class="cc-role">${h(role.name)}</div>
+          <div class="cc-dept">${h(dept?.name||'')}</div>
+        </div>
+        <div>
+          <div class="cc-pct" style="color:${barColor}">${pct}%</div>
+          ${isCurrent?'<div style="font-size:10px;color:#2563eb;font-weight:700">Current Role</div>':''}
+          ${isBest?'<span class="best-badge">Best Match</span>':''}
+        </div>
+      </div>
+      <div class="cc-bar-track"><div class="cc-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      ${missing.length?`<div class="cc-missing"><strong>${missing.length} gap${missing.length!==1?'s':''}</strong>: ${missing.slice(0,3).map(x=>`${h(x.s.name)} (${x.lv}→${x.tgt})`).join(', ')}${missing.length>3?'…':''}</div>`:'<div class="cc-missing" style="color:#16a34a;font-weight:600">✓ All targets met</div>'}
+    </div>`;
+  }).join('');
+}
+
+function switchPTab(tab,el){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.ptab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`ptab-${tab}`).classList.add('active');
+}
+
+function backToPeople(){
+  document.getElementById('personDetail').classList.remove('active');
+  document.getElementById('personDetail').innerHTML='';
+  document.getElementById('peopleList').style.display='';
+  document.getElementById('breadcrumb').innerHTML='<span>People</span>';
+}
+
+// ═══════════════════════════════════════════════════
+// ROLES
+// ═══════════════════════════════════════════════════
+function renderRoles(){
+  document.getElementById('rolesGrid').innerHTML=D.roles.map(role=>{
+    const dept=D.departments.find(d=>d.id===role.deptId);
+    const members=D.members.filter(m=>m.roleId===role.id);
+    const tgtKeys=Object.keys(role.targets);
+    const deptColor=dept?.color||'#64748b';
+    return `<div class="role-card">
+      <div class="rc-header">
+        <div class="rc-icon" style="background:${deptColor}18;color:${deptColor}"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></div>
+        <div>
+          <div class="rc-name">${h(role.name)}</div>
+          <div class="rc-dept">${h(dept?.name||'')}</div>
+          <div class="rc-members">${members.length} member${members.length!==1?'s':''}</div>
+        </div>
+      </div>
+      <div class="rc-skills">
+        ${tgtKeys.map(sId=>{
+          const s=D.skills.find(x=>x.id===parseInt(sId));
+          if(!s) return '';
+          const req=parseInt(role.targets[sId]);
+          const info=LV[req]||LV[0];
+          return `<div class="rc-skill-row"><div class="rc-skill-name">${h(s.name)}</div><span class="rc-skill-req" style="background:${info.bg};color:${info.color}">${req}</span></div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// MATRIX
+// ═══════════════════════════════════════════════════
+function populateFilters(){
   const cats=[...new Set(D.skills.map(s=>s.category))];
-  const sel=document.getElementById('categoryFilter');
-  sel.innerHTML='<option value="">All Categories</option>'+cats.map(c=>`<option value="${h(c)}">${h(c)}</option>`).join('');
+  document.getElementById('catFilter').innerHTML='<option value="">All Categories</option>'+cats.map(c=>`<option>${h(c)}</option>`).join('');
+  document.getElementById('deptFilter').innerHTML='<option value="">All Departments</option>'+D.departments.map(d=>`<option value="${d.id}">${h(d.name)}</option>`).join('');
 }
 
 function getFilteredSkills(){
-  const cat=document.getElementById('categoryFilter')?.value||'';
+  const cat=document.getElementById('catFilter')?.value||'';
   return cat?D.skills.filter(s=>s.category===cat):D.skills;
 }
 
-function applyFilters(){ if(activeTab==='matrix') renderMatrix(); }
-function toggleGaps(){ gapsOnly=!gapsOnly; document.getElementById('gapsToggle').classList.toggle('active',gapsOnly); renderMatrix(); }
+function applyFilters(){
+  if(activeTab==='matrix') renderMatrix();
+  if(activeTab==='people') renderPeople();
+}
+function toggleGaps(){gapsOnly=!gapsOnly;document.getElementById('gapsToggle').classList.toggle('active',gapsOnly);renderMatrix();}
 
 function renderMatrix(){
   const skills=getFilteredSkills();
-  const search=(document.getElementById('searchInput')?.value||'').toLowerCase().trim();
-  const showAvg=D.settings.avgRow;
-  const showGaps=D.settings.gapIndicators;
+  const deptId=document.getElementById('deptFilter')?.value||'';
+  const search=(document.getElementById('searchInput')?.value||'').toLowerCase();
+  const showAvg=D.settings.avgRow,showGaps=D.settings.gapIndicators,showInt=D.settings.showInterest;
 
-  // HEADER
-  let html='<thead><tr>';
-  html+=`<th class="th-corner">Member / Skill</th>`;
+  let html='<thead><tr><th class="th-corner">Member / Skill</th>';
   for(const s of skills){
-    const cc=CAT_CLR[s.category]||{bg:'#f1f5f9',text:'#64748b'};
-    html+=`<th class="th-skill"><div class="skill-head-inner">
-      <div class="skill-head-name">${h(s.name)}</div>
-      <div class="cat-pill" style="background:${cc.bg};color:${cc.text}">${h(s.category)}</div>
-    </div></th>`;
+    const cc=CAT[s.category]||{dot:'#64748b'};
+    html+=`<th class="th-skill"><div class="th-skill-inner"><div class="th-skill-name">${h(s.name)}</div><div class="th-cat-dot" style="background:${cc.dot}"></div></div></th>`;
   }
   html+='</tr></thead><tbody>';
 
-  // ROWS
   for(const m of D.members){
-    const hasGap=skills.some(s=>getLevel(m.id,s.id)<s.required);
-    const matchSearch=!search||(m.name.toLowerCase().includes(search)||m.role.toLowerCase().includes(search)||skills.some(s=>s.name.toLowerCase().includes(search)));
-    const hide=(gapsOnly&&!hasGap)||!matchSearch;
+    const role=getMemberRole(m);
+    const hasGap=skills.some(s=>{const tgt=getRoleTarget(m,s.id)||s.required;return tgt&&getLevel(m.id,s.id)<tgt;});
+    const matchDept=!deptId||String(m.deptId)===String(deptId);
+    const matchSearch=!search||(m.name.toLowerCase().includes(search)||role?.name.toLowerCase().includes(search));
+    const hide=(gapsOnly&&!hasGap)||!matchDept||!matchSearch;
     html+=`<tr class="${hide?'hidden-row':''}">`;
-    html+=`<td class="td-member"><div class="member-wrap">
-      <div class="m-avatar" style="background:${m.color}">${h(m.initials)}</div>
-      <div><div class="m-name">${h(m.name)}</div><div class="m-role">${h(m.role)}</div></div>
-    </div></td>`;
+    const dept=getMemberDept(m);
+    const deptColor=dept?.color||'#64748b';
+    html+=`<td class="td-member"><div class="mem-wrap"><div class="mem-av" style="background:${m.color}">${h(m.initials)}</div><div><div class="mem-name">${h(m.name)}</div><div class="mem-role" style="color:${deptColor}">${h(role?.name||'—')}</div></div></div></td>`;
     for(const s of skills){
-      const lv=getLevel(m.id,s.id);
-      const isGap=lv<s.required;
+      const lv=getLevel(m.id,s.id),tgt=getRoleTarget(m,s.id)||s.required;
+      const isGap=tgt&&lv<tgt,hasInt=getInterest(m.id,s.id);
       const gapClass=(showGaps&&isGap)?'gap-cell':'';
       html+=`<td class="td-cell"><div class="skill-cell lv${lv} ${gapClass}"
         onmouseenter="showTT(event,${m.id},${s.id})" onmouseleave="hideTT()"
-        onclick="openModal(${m.id},${s.id})">${lv===0?'–':lv}</div></td>`;
+        onclick="openModal(${m.id},${s.id})">${lv===0?'–':lv}${(showInt&&hasInt)?'<div class="int-dot"></div>':''}
+      </div></td>`;
     }
     html+='</tr>';
   }
 
-  // AVG ROW
   if(showAvg){
-    html+='<tr class="avg-row"><td class="td-member"><div class="member-wrap">';
-    html+=`<div class="m-avatar" style="background:#6366f1;font-size:16px">≈</div>`;
-    html+=`<div><div class="m-name">Team Average</div><div class="m-role"><span class="avg-badge">AVG</span></div></div>`;
-    html+='</div></td>';
+    html+='<tr class="avg-row"><td class="td-member"><div class="mem-wrap"><div class="mem-av" style="background:#6366f1;font-size:16px">≈</div><div><div class="mem-name">Team Average</div><div class="mem-role"><span class="avg-badge">AVG</span></div></div></div></td>';
     for(const s of skills){
       const vals=D.members.map(m=>getLevel(m.id,s.id));
       const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
-      const lvRound=Math.round(avg);
-      html+=`<td class="td-cell"><div class="avg-cell lv${lvRound}"
-        onmouseenter="showAvgTT(event,${s.id},${avg})" onmouseleave="hideTT()">${avg.toFixed(1)}</div></td>`;
+      html+=`<td class="td-cell"><div class="avg-cell lv${Math.round(avg)}" onmouseenter="showAvgTT(event,${s.id},${avg})" onmouseleave="hideTT()">${avg.toFixed(1)}</div></td>`;
     }
     html+='</tr>';
   }
-
   html+='</tbody>';
   document.getElementById('matrixTable').innerHTML=html;
   renderSummaryBar(skills);
 }
 
-// ── SUMMARY BAR ───────────────────────────────────────
 function renderSummaryBar(skills){
   const members=D.members;
   let assessed=0,meetReq=0,totalLv=0,withGaps=0;
@@ -645,10 +1198,9 @@ function renderSummaryBar(skills){
   for(const m of members){
     let hasGap=false;
     for(const s of skills){
-      const lv=getLevel(m.id,s.id);
+      const lv=getLevel(m.id,s.id),tgt=getRoleTarget(m,s.id)||s.required;
       if(lv>0) assessed++;
-      if(lv>=s.required) meetReq++;
-      else hasGap=true;
+      if(tgt){if(lv>=tgt) meetReq++;else hasGap=true;}
       totalLv+=lv;
     }
     if(hasGap) withGaps++;
@@ -658,294 +1210,209 @@ function renderSummaryBar(skills){
   const avgLv=total?(totalLv/total).toFixed(1):'0.0';
   const cv=v=>v>=80?'good':v>=55?'warn':'bad';
   document.getElementById('summaryBar').innerHTML=`
-    <div class="sum-item"><div class="sum-label">Team Members</div><div class="sum-value">${members.length}</div></div>
-    <div class="sum-item"><div class="sum-label">Skills Tracked</div><div class="sum-value">${skills.length}</div></div>
-    <div class="sum-item"><div class="sum-label">Coverage</div><div class="sum-value ${cv(covPct)}">${covPct}%</div></div>
-    <div class="sum-item"><div class="sum-label">Meeting Required</div><div class="sum-value ${cv(reqPct)}">${reqPct}%</div></div>
-    <div class="sum-item"><div class="sum-label">Members w/ Gaps</div><div class="sum-value ${withGaps===0?'good':withGaps<=2?'warn':'bad'}">${withGaps}</div></div>
-    <div class="sum-item"><div class="sum-label">Team Avg Level</div><div class="sum-value ${avgLv>=3.5?'good':avgLv>=2.5?'warn':'bad'}">${avgLv}</div></div>
+    <div class="sum-item"><div class="sum-label">Members</div><div class="sum-value">${members.length}</div></div>
+    <div class="sum-item"><div class="sum-label">Skills</div><div class="sum-value">${skills.length}</div></div>
+    <div class="sum-item"><div class="sum-label">Assessed</div><div class="sum-value ${cv(covPct)}">${covPct}%</div></div>
+    <div class="sum-item"><div class="sum-label">At Target</div><div class="sum-value ${cv(reqPct)}">${reqPct}%</div></div>
+    <div class="sum-item"><div class="sum-label">w/ Gaps</div><div class="sum-value ${withGaps===0?'good':withGaps<=2?'warn':'bad'}">${withGaps}</div></div>
+    <div class="sum-item"><div class="sum-label">Team Avg</div><div class="sum-value ${avgLv>=3.5?'good':avgLv>=2.5?'warn':'bad'}">${avgLv}</div></div>
   `;
 }
 
-// ── TOOLTIP ───────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+// TOOLTIP
+// ═══════════════════════════════════════════════════
 const ttEl=document.getElementById('tooltip');
-
 function showTT(e,mId,sId){
-  const m=D.members.find(x=>x.id===mId);
-  const s=D.skills.find(x=>x.id===sId);
-  const lv=getLevel(mId,sId);
-  const info=LV[lv];
-  const isGap=lv<s.required;
-  ttEl.innerHTML=`<div class="tt-skill">${h(s.name)}</div>
-    <div class="tt-member">${h(m.name)} · ${h(m.role)}</div>
-    <div class="tt-level-row"><div class="tt-dot" style="background:${info.color}"></div><span><strong>Level ${lv}</strong> — ${info.label}</span></div>
-    <div class="tt-required">Required: Level ${s.required} (${LV[s.required].label})</div>
-    ${isGap?'<div class="tt-gap">⚠ Below required level</div>':''}`;
-  posTT(e); ttEl.classList.add('visible');
+  const m=D.members.find(x=>x.id===mId),s=D.skills.find(x=>x.id===sId);
+  const lv=getLevel(mId,sId),tgt=getRoleTarget(m,sId)||s.required,info=LV[lv];
+  const isGap=tgt&&lv<tgt,hasInt=getInterest(mId,sId);
+  ttEl.innerHTML=`<div class="tt-title">${h(s.name)}</div>
+    <div class="tt-sub">${h(m.name)} · ${h(getMemberRole(m)?.name||'—')}</div>
+    <div class="tt-row"><div class="tt-dot" style="background:${info.color}"></div><strong>Level ${lv}</strong> — ${info.label}</div>
+    <div class="tt-divider"></div>
+    <div style="font-size:11.5px;color:#94a3b8">Role target: ${tgt||'None'}</div>
+    ${isGap?`<div class="tt-gap">⚠ ${tgt-lv} level${tgt-lv!==1?'s':''} below target</div>`:''}
+    ${hasInt?'<div class="tt-interest">★ Interested in developing</div>':''}
+    <div class="tt-edit">Click to edit</div>`;
+  posTT(e);ttEl.classList.add('visible');
 }
-
 function showAvgTT(e,sId,avg){
-  const s=D.skills.find(x=>x.id===sId);
-  const info=LV[Math.round(avg)]||LV[0];
-  ttEl.innerHTML=`<div class="tt-skill">${h(s.name)}</div>
-    <div class="tt-member">Team Average</div>
-    <div class="tt-level-row"><div class="tt-dot" style="background:${info.color}"></div><span><strong>${avg.toFixed(2)}</strong> avg across team</span></div>
-    <div class="tt-required">Required: Level ${s.required}</div>
-    ${avg<s.required?'<div class="tt-gap">⚠ Team average below required</div>':''}`;
-  posTT(e); ttEl.classList.add('visible');
+  const s=D.skills.find(x=>x.id===sId),info=LV[Math.round(avg)]||LV[0];
+  ttEl.innerHTML=`<div class="tt-title">${h(s.name)}</div><div class="tt-sub">Team Average</div>
+    <div class="tt-row"><div class="tt-dot" style="background:${info.color}"></div><strong>${avg.toFixed(2)}</strong> avg</div>
+    <div class="tt-divider"></div>
+    <div style="font-size:11.5px;color:#94a3b8">Default target: ${s.required}</div>
+    ${avg<s.required?'<div class="tt-gap">⚠ Team avg below default target</div>':''}`;
+  posTT(e);ttEl.classList.add('visible');
 }
+function posTT(e){const x=e.clientX+14,y=e.clientY-10;ttEl.style.left=(x+230>window.innerWidth?x-244:x)+'px';ttEl.style.top=(y+170>window.innerHeight?y-160:y)+'px';}
+function hideTT(){ttEl.classList.remove('visible');}
 
-function posTT(e){
-  const x=e.clientX+14, y=e.clientY-10;
-  ttEl.style.left=(x+220>window.innerWidth?x-234:x)+'px';
-  ttEl.style.top=(y+160>window.innerHeight?y-150:y)+'px';
-}
-function hideTT(){ ttEl.classList.remove('visible'); }
-
-// ── EDIT MODAL ────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+// EDIT MODAL
+// ═══════════════════════════════════════════════════
 function openModal(mId,sId){
-  const m=D.members.find(x=>x.id===mId);
-  const s=D.skills.find(x=>x.id===sId);
-  const cur=getLevel(mId,sId);
-  editTarget={mId,sId}; selLevel=cur;
-  document.getElementById('modalTitle').textContent=`Edit: ${s.name}`;
-  document.getElementById('modalSub').textContent=`${m.name} · ${m.role}`;
+  const m=D.members.find(x=>x.id===mId),s=D.skills.find(x=>x.id===sId);
+  const cur=getLevel(mId,sId),curInt=getInterest(mId,sId);
+  editTarget={mId,sId};selLevel=cur;selInterest=curInt;
+  document.getElementById('modalTitle').textContent=`${s.name}`;
+  document.getElementById('modalSub').textContent=`${m.name} · ${getMemberRole(m)?.name||'—'}`;
   let html='';
-  for(let i=0;i<=5;i++){
-    const info=LV[i];
-    const sel=cur===i;
-    html+=`<div class="lp-btn" onclick="selectLv(${i},this)"
-      style="border-color:${sel?info.color:'#e2e8f0'};background:${sel?info.bg:'#fff'}">
-      <div class="lp-num" style="color:${info.color}">${i}</div>
-      <div class="lp-lbl">${info.label}</div>
-    </div>`;
-  }
+  for(let i=0;i<=5;i++){const info=LV[i];const sel=cur===i;html+=`<div class="lp-btn" onclick="selectLv(${i},this)" style="border-color:${sel?info.color:'#e2e8f0'};background:${sel?info.bg:'#fff'}"><div class="lp-num" style="color:${info.color}">${i}</div><div class="lp-lbl">${info.label}</div></div>`;}
   document.getElementById('levelPicker').innerHTML=html;
+  document.getElementById('itSwitch').classList.toggle('on',curInt);
   document.getElementById('editModal').classList.add('open');
 }
+function selectLv(lv,el){selLevel=lv;const info=LV[lv];document.querySelectorAll('.lp-btn').forEach(b=>{b.style.borderColor='#e2e8f0';b.style.background='#fff';});el.style.borderColor=info.color;el.style.background=info.bg;}
+function toggleInterest(){selInterest=!selInterest;document.getElementById('itSwitch').classList.toggle('on',selInterest);}
+function saveSkill(){if(editTarget&&selLevel!==null){setLevel(editTarget.mId,editTarget.sId,selLevel);setInterest(editTarget.mId,editTarget.sId,selInterest);closeModal();renderMatrix();}}
+function closeModal(){document.getElementById('editModal').classList.remove('open');editTarget=null;selLevel=null;}
+document.getElementById('editModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
 
-function selectLv(lv,el){
-  selLevel=lv;
-  const info=LV[lv];
-  document.querySelectorAll('.lp-btn').forEach(b=>{ b.style.borderColor='#e2e8f0'; b.style.background='#fff'; });
-  el.style.borderColor=info.color; el.style.background=info.bg;
-}
-
-function saveLevel(){
-  if(editTarget&&selLevel!==null){
-    setLevel(editTarget.mId,editTarget.sId,selLevel);
-    closeModal(); renderMatrix();
-  }
-}
-function closeModal(){
-  document.getElementById('editModal').classList.remove('open');
-  editTarget=null; selLevel=null;
-}
-
-// Close modals on overlay click
-document.getElementById('editModal').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeModal(); });
-document.getElementById('addMemberModal').addEventListener('click',e=>{ if(e.target===e.currentTarget) document.getElementById('addMemberModal').classList.remove('open'); });
-
-// ── DASHBOARD ─────────────────────────────────────────
-function renderDashboard(){
-  const members=D.members, skills=D.skills;
-  const total=members.length*skills.length;
-  let assessed=0,meetReq=0,totalLv=0,withGaps=0;
-  for(const m of members){
-    let hasGap=false;
-    for(const s of skills){
-      const lv=getLevel(m.id,s.id);
-      if(lv>0) assessed++;
-      if(lv>=s.required) meetReq++;
-      else hasGap=true;
-      totalLv+=lv;
-    }
-    if(hasGap) withGaps++;
-  }
-  const reqPct=total?Math.round(meetReq/total*100):0;
-
-  document.getElementById('dashStats').innerHTML=`
-    <div class="stat-card"><div class="stat-icon blue"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><div class="stat-value">${members.length}</div><div class="stat-label">Team Members</div></div>
-    <div class="stat-card"><div class="stat-icon purple"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="stat-value">${skills.length}</div><div class="stat-label">Skills Tracked</div></div>
-    <div class="stat-card"><div class="stat-icon green"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div class="stat-value" style="color:#22c55e">${reqPct}%</div><div class="stat-label">Meeting Required Level</div></div>
-    <div class="stat-card"><div class="stat-icon red"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="stat-value" style="color:#ef4444">${withGaps}</div><div class="stat-label">Members with Skill Gaps</div></div>
-  `;
-
-  // Category coverage
-  const cats=[...new Set(skills.map(s=>s.category))];
-  const catBars=cats.map(cat=>{
-    const cs=skills.filter(s=>s.category===cat);
-    let meet=0,tot=0;
-    for(const m of members) for(const s of cs){ tot++; if(getLevel(m.id,s.id)>=s.required) meet++; }
-    const pct=tot?Math.round(meet/tot*100):0;
-    const cc=CAT_CLR[cat]||{bg:'#f1f5f9',text:'#64748b'};
-    return `<div class="bar-row"><div class="bar-lbl">${h(cat)}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(pct,6)}%;background:${cc.text}"><span class="bar-val">${pct}%</span></div></div></div>`;
-  }).join('');
-  document.getElementById('dashCatChart').innerHTML=`<div class="bar-chart">${catBars}</div>`;
-
-  // Top gaps (skills with most members below required)
-  const gapSkills=skills.map(s=>({s,gaps:members.filter(m=>getLevel(m.id,s.id)<s.required).length}))
-    .sort((a,b)=>b.gaps-a.gaps).slice(0,8);
-  const gapBars=gapSkills.map(({s,gaps})=>{
-    const pct=members.length?Math.round(gaps/members.length*100):0;
-    return `<div class="bar-row"><div class="bar-lbl">${h(s.name)}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(pct,gaps>0?8:0)}%;background:#ef4444"><span class="bar-val">${gaps} gap${gaps!==1?'s':''}</span></div></div></div>`;
-  }).join('');
-  document.getElementById('dashGapChart').innerHTML=`<div class="bar-chart">${gapBars}</div>`;
-}
-
-// ── TEAM ──────────────────────────────────────────────
-function renderTeam(){
-  document.getElementById('teamGrid').innerHTML=D.members.map(m=>{
-    const skills=D.skills;
-    let avgLv=0,gaps=0;
-    for(const s of skills){ const lv=getLevel(m.id,s.id); avgLv+=lv; if(lv<s.required) gaps++; }
-    avgLv=skills.length?(avgLv/skills.length).toFixed(1):'0.0';
-    return `<div class="member-card">
-      <div class="mc-avatar" style="background:${m.color}">${h(m.initials)}</div>
-      <div style="flex:1">
-        <div class="mc-name">${h(m.name)}</div>
-        <div class="mc-role">${h(m.role)}</div>
-        <div class="mc-stats">
-          <div class="mc-stat"><div class="val">${avgLv}</div><div class="lbl">Avg Level</div></div>
-          <div class="mc-stat"><div class="val" style="color:${gaps>0?'#ef4444':'#22c55e'}">${gaps}</div><div class="lbl">Gaps</div></div>
-          <div class="mc-stat"><div class="val">${skills.length}</div><div class="lbl">Skills</div></div>
-        </div>
-      </div>
-      <button class="btn btn-danger" style="font-size:12px;padding:6px 10px;align-self:flex-start" onclick="deleteMember(${m.id})">Remove</button>
+// ═══════════════════════════════════════════════════
+// SKILL LIBRARY
+// ═══════════════════════════════════════════════════
+function renderLibrary(){
+  const cats=[...new Set(D.skills.map(s=>s.category))];
+  document.getElementById('skillCats').innerHTML=cats.map(cat=>{
+    const catSkills=D.skills.filter(s=>s.category===cat);
+    const cc=CAT[cat]||{bg:'#f1f5f9',text:'#64748b'};
+    return `<div class="skill-cat-section">
+      <h3><span class="skill-cat-badge" style="background:${cc.bg};color:${cc.text}">${h(cat)}</span>${h(cat)} Skills</h3>
+      <div class="skill-list">${catSkills.map(s=>{
+        const dots=Array.from({length:5},(_,i)=>`<div class="req-dot${i<s.required?' on':''}"></div>`).join('');
+        return `<div class="skill-row">
+          <div style="flex:1"><div class="skill-name-text">${h(s.name)}</div>${s.description?`<div class="skill-desc">${h(s.description)}</div>`:''}</div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;color:var(--muted)">Default target:</span><div class="req-dots">${dots}</div><span style="font-size:12px;font-weight:700;color:var(--primary)">${s.required}</span></div>
+          <button class="del-btn" onclick="deleteSkill(${s.id})">✕</button>
+        </div>`;
+      }).join('')}</div>
     </div>`;
   }).join('');
 }
-
-function addMember(){
-  const name=document.getElementById('newMemberName').value.trim();
-  const role=document.getElementById('newMemberRole').value.trim();
-  if(!name||!role){ alert('Please enter both name and role.'); return; }
-  const initials=name.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
-  const palette=['#6366f1','#8b5cf6','#ec4899','#f97316','#14b8a6','#f43f5e','#3b82f6','#10b981','#f59e0b'];
-  const color=palette[D.members.length%palette.length];
-  D.members.push({id:D.nextMemberId++,name,role,initials,color});
-  saveData();
-  document.getElementById('newMemberName').value='';
-  document.getElementById('newMemberRole').value='';
-  document.getElementById('addMemberModal').classList.remove('open');
-  renderTeam();
-}
-
-function deleteMember(id){
-  if(!confirm('Remove this team member?')) return;
-  D.members=D.members.filter(m=>m.id!==id);
-  Object.keys(D.matrix).forEach(k=>{ if(k.startsWith(`${id}-`)) delete D.matrix[k]; });
-  saveData(); renderTeam();
-}
-
-// ── SKILLS ────────────────────────────────────────────
-function renderSkills(){
-  document.getElementById('skillsList').innerHTML=D.skills.map(s=>{
-    const cc=CAT_CLR[s.category]||{bg:'#f1f5f9',text:'#64748b'};
-    const dots=Array.from({length:5},(_,i)=>`<div class="req-dot${i<s.required?' on':''}"></div>`).join('');
-    return `<div class="skill-item">
-      <span class="cat-badge" style="background:${cc.bg};color:${cc.text}">${h(s.category)}</span>
-      <span class="skill-name-txt">${h(s.name)}</span>
-      <div class="req-indicator"><span class="req-label">Req: ${s.required}</span><div class="req-dots">${dots}</div></div>
-      <button class="del-btn" onclick="deleteSkill(${s.id})">✕</button>
-    </div>`;
-  }).join('');
-}
-
 function addSkill(){
-  const name=document.getElementById('newSkillName').value.trim();
-  const category=document.getElementById('newSkillCat').value;
-  const required=parseInt(document.getElementById('newSkillReq').value);
-  if(!name){ alert('Enter a skill name.'); return; }
-  D.skills.push({id:D.nextSkillId++,name,category,required});
-  saveData();
-  document.getElementById('newSkillName').value='';
-  renderSkills();
+  const name=document.getElementById('ns-name').value.trim();
+  const category=document.getElementById('ns-cat').value;
+  const required=parseInt(document.getElementById('ns-req').value);
+  const description=document.getElementById('ns-desc').value.trim();
+  if(!name){alert('Enter a skill name.');return;}
+  D.skills.push({id:D.nextSkillId++,name,category,required,description});
+  saveData();document.getElementById('ns-name').value='';document.getElementById('ns-desc').value='';renderLibrary();
 }
-
 function deleteSkill(id){
   if(!confirm('Delete this skill?')) return;
   D.skills=D.skills.filter(s=>s.id!==id);
-  Object.keys(D.matrix).forEach(k=>{ if(k.endsWith(`-${id}`)) delete D.matrix[k]; });
-  saveData(); renderSkills();
+  Object.keys(D.matrix).forEach(k=>{if(k.endsWith(`-${id}`))delete D.matrix[k];});
+  Object.keys(D.interests).forEach(k=>{if(k.endsWith(`-${id}`))delete D.interests[k];});
+  saveData();renderLibrary();
 }
 
-// ── REPORTING ─────────────────────────────────────────
-function renderReporting(){
-  const members=D.members, skills=D.skills;
-
-  function barChart(rows){ return `<div class="bar-chart">${rows.join('')}</div>`; }
-  function barRow(lbl,val,max,color,dispVal){
-    const pct=max?Math.max(val/max*100,val>0?6:0):0;
-    return `<div class="bar-row"><div class="bar-lbl">${h(lbl)}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"><span class="bar-val">${dispVal}</span></div></div></div>`;
-  }
-
-  // Avg by member
-  const memberRows=members.map(m=>{
-    const avg=skills.reduce((s2,s)=>s2+getLevel(m.id,s.id),0)/skills.length;
-    const info=LV[Math.round(avg)]||LV[0];
-    return barRow(m.name,avg,5,info.color,avg.toFixed(1));
-  });
-
-  // Avg by skill
-  const skillRows=skills.map(s=>{
-    const avg=members.reduce((s2,m)=>s2+getLevel(m.id,s.id),0)/members.length;
-    const info=LV[Math.round(avg)]||LV[0];
-    return barRow(s.name,avg,5,info.color,avg.toFixed(1));
-  });
-
+// ═══════════════════════════════════════════════════
+// GAP ANALYSIS
+// ═══════════════════════════════════════════════════
+function renderGaps(){
+  const members=D.members,skills=D.skills;
+  // Gaps by skill
+  const skillGaps=skills.map(s=>({s,gaps:members.filter(m=>{const tgt=getRoleTarget(m,s.id)||s.required;return tgt&&getLevel(m.id,s.id)<tgt;}).length})).sort((a,b)=>b.gaps-a.gaps);
+  document.getElementById('gapBySkill').innerHTML=`<div class="chart-row">${skillGaps.slice(0,8).map(({s,gaps})=>barRow(s.name,gaps,`${gaps}/${members.length}`,'#ef4444',members.length)).join('')}</div>`;
   // Gaps by member
-  const gapRows=members.map(m=>({m,gaps:skills.filter(s=>getLevel(m.id,s.id)<s.required).length}))
-    .sort((a,b)=>b.gaps-a.gaps)
-    .map(({m,gaps})=>barRow(m.name,gaps,skills.length,'#ef4444',`${gaps} gap${gaps!==1?'s':''}`));
+  const memberGaps=members.map(m=>({m,gaps:skills.filter(s=>{const tgt=getRoleTarget(m,s.id)||s.required;return tgt&&getLevel(m.id,s.id)<tgt;}).length})).sort((a,b)=>b.gaps-a.gaps);
+  document.getElementById('gapByMember').innerHTML=`<div class="chart-row">${memberGaps.map(({m,gaps})=>barRow(m.name,gaps,`${gaps} gaps`,gaps>5?'#dc2626':gaps>2?'#d97706':'#16a34a',skills.length)).join('')}</div>`;
+  // Priority list
+  const priority=[];
+  for(const s of skills){
+    const gapMembers=members.filter(m=>{const tgt=getRoleTarget(m,s.id)||s.required;return tgt&&getLevel(m.id,s.id)<tgt;});
+    if(gapMembers.length===0) continue;
+    const totalGap=gapMembers.reduce((sum,m)=>{const tgt=getRoleTarget(m,s.id)||s.required;return sum+(tgt-getLevel(m.id,s.id));},0);
+    const urgency=gapMembers.length>=4?'high':gapMembers.length>=2?'med':'low';
+    priority.push({s,gapMembers,totalGap,urgency});
+  }
+  priority.sort((a,b)=>b.gapMembers.length-a.gapMembers.length||(b.totalGap-a.totalGap));
+  const cc=CAT;
+  document.getElementById('gapPriorityList').innerHTML=priority.map(({s,gapMembers,totalGap,urgency},i)=>{
+    const cat=CAT[s.category]||{bg:'#f1f5f9',text:'#64748b'};
+    return `<div class="gap-item">
+      <div class="gap-priority pri-${urgency}">${i+1}</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px"><div class="gap-skill-name">${h(s.name)}</div><span class="skill-cat-badge" style="background:${cat.bg};color:${cat.text};font-size:10px;padding:1px 7px;border-radius:8px">${h(s.category)}</span></div>
+        <div class="gap-meta">${h(gapMembers.map(m=>m.name).join(', '))}</div>
+      </div>
+      <span class="gap-count">${gapMembers.length} affected</span>
+    </div>`;
+  }).join('');
+}
 
-  // Avg by category
-  const cats=[...new Set(skills.map(s=>s.category))];
-  const catRows=cats.map(cat=>{
-    const cs=skills.filter(s=>s.category===cat);
-    const avg=members.reduce((s2,m)=>s2+cs.reduce((s3,s)=>s3+getLevel(m.id,s.id),0),0)/(members.length*cs.length);
-    const cc=CAT_CLR[cat]||{bg:'#f1f5f9',text:'#64748b'};
-    return barRow(cat,avg,5,cc.text,avg.toFixed(1));
-  });
-
+// ═══════════════════════════════════════════════════
+// REPORTS
+// ═══════════════════════════════════════════════════
+function renderReports(){
+  const members=D.members,skills=D.skills;
+  const memberBars=members.map(m=>{const avg=skills.reduce((s2,s)=>s2+getLevel(m.id,s.id),0)/skills.length;const info=LV[Math.round(avg)]||LV[0];return barRow(m.name,avg,avg.toFixed(1),info.color,5);}).join('');
+  const skillBars=skills.map(s=>{const avg=members.reduce((s2,m)=>s2+getLevel(m.id,s.id),0)/members.length;const info=LV[Math.round(avg)]||LV[0];return barRow(s.name,avg,avg.toFixed(1),info.color,5);}).join('');
+  const catBars=[...new Set(skills.map(s=>s.category))].map(cat=>{const cs=skills.filter(s=>s.category===cat);const avg=members.reduce((s2,m)=>s2+cs.reduce((s3,s)=>s3+getLevel(m.id,s.id),0),0)/(members.length*cs.length);const cc=CAT[cat]||{text:'#64748b'};return barRow(cat,avg,avg.toFixed(1),cc.text,5);}).join('');
+  const intBars=[...skills].sort((a,b)=>D.members.filter(m=>getInterest(m.id,b.id)).length-D.members.filter(m=>getInterest(m.id,a.id)).length).slice(0,10).map(s=>{const count=members.filter(m=>getInterest(m.id,s.id)).length;return barRow(s.name,count,`${count} people`,'#2563eb',members.length);}).join('');
   document.getElementById('reportGrid').innerHTML=`
-    <div class="report-card"><h3>Avg Level by Member</h3>${barChart(memberRows)}</div>
-    <div class="report-card"><h3>Avg Level by Skill</h3>${barChart(skillRows)}</div>
-    <div class="report-card"><h3>Skill Gaps by Member</h3>${barChart(gapRows)}</div>
-    <div class="report-card"><h3>Avg Level by Category</h3>${barChart(catRows)}</div>
+    <div class="report-card"><h3>Avg Level by Member</h3><div class="chart-row">${memberBars}</div></div>
+    <div class="report-card"><h3>Avg Level by Skill</h3><div class="chart-row">${skillBars}</div></div>
+    <div class="report-card"><h3>Avg Level by Category</h3><div class="chart-row">${catBars}</div></div>
+    <div class="report-card"><h3>Top Skills by Interest</h3><div class="chart-row">${intBars}</div></div>
   `;
 }
 
-// ── SETTINGS ──────────────────────────────────────────
-function renderSettings(){
-  ['avgRow','gapIndicators','compact'].forEach(k=>{
-    const el=document.getElementById(`s-${k}`);
-    if(el) el.classList.toggle('on',!!D.settings[k]);
-  });
+// ═══════════════════════════════════════════════════
+// ADD MEMBER
+// ═══════════════════════════════════════════════════
+function openAddMember(){
+  document.getElementById('nm-roleId').innerHTML='<option value="">Select role…</option>'+D.roles.map(r=>`<option value="${r.id}">${h(r.name)}</option>`).join('');
+  document.getElementById('nm-deptId').innerHTML='<option value="">Select department…</option>'+D.departments.map(d=>`<option value="${d.id}">${h(d.name)}</option>`).join('');
+  document.getElementById('addMemberModal').classList.add('open');
 }
-function toggleSetting(k){
-  D.settings[k]=!D.settings[k];
-  saveData(); renderSettings();
+function closeAddMember(){document.getElementById('addMemberModal').classList.remove('open');}
+document.getElementById('addMemberModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeAddMember();});
+function addMember(){
+  const name=document.getElementById('nm-name').value.trim();
+  const roleId=parseInt(document.getElementById('nm-roleId').value)||null;
+  const deptId=parseInt(document.getElementById('nm-deptId').value)||null;
+  if(!name){alert('Enter a name.');return;}
+  const initials=name.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+  const palette=['#6366f1','#8b5cf6','#ec4899','#f97316','#14b8a6','#f43f5e','#3b82f6','#10b981'];
+  const color=palette[D.members.length%palette.length];
+  D.members.push({id:D.nextMemberId++,name,roleId,deptId,managerId:null,initials,color,email:''});
+  saveData();
+  document.getElementById('nm-name').value='';
+  closeAddMember();renderPeople();
 }
 
-// ── EXPORT CSV ────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════
+function renderSettings(){
+  ['avgRow','gapIndicators','showInterest','selfAssess'].forEach(k=>{const el=document.getElementById(`s-${k}`);if(el)el.classList.toggle('on',!!D.settings[k]);});
+}
+function toggleSetting(k){D.settings[k]=!D.settings[k];saveData();renderSettings();}
+
+// ═══════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════
 function exportCSV(){
   const skills=D.skills;
-  let csv='Name,Role,'+skills.map(s=>`"${s.name}"`).join(',')+'\n';
-  for(const m of D.members){
-    csv+=`"${m.name}","${m.role}",`+skills.map(s=>getLevel(m.id,s.id)).join(',')+'\n';
-  }
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download='skills-matrix.csv'; a.click();
+  let csv='Name,Role,Department,'+skills.map(s=>`"${s.name}"`).join(',')+'\n';
+  for(const m of D.members){const role=getMemberRole(m),dept=getMemberDept(m);csv+=`"${m.name}","${role?.name||''}","${dept?.name||''}",`+skills.map(s=>getLevel(m.id,s.id)).join(',')+'\n';}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='skills-matrix.csv';a.click();
 }
 
-// ── UTILS ─────────────────────────────────────────────
-function h(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+// ═══════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════
+function h(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-// ── INIT ──────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
 loadData();
 renderDashboard();
+renderSettings();
 </script>
 </body>
 </html>
