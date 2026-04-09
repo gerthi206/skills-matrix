@@ -155,7 +155,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .mem-name{font-size:13px;font-weight:600;color:var(--text)}
 .mem-role{font-size:11px;color:var(--muted)}
 .td-cell{padding:4px 3px;text-align:center}
-.skill-cell{width:50px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;margin:0 auto;cursor:pointer;transition:transform .12s,box-shadow .12s;border:2px solid transparent;position:relative;user-select:none}
+.skill-cell{width:50px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;margin:0 auto;cursor:pointer;transition:transform .12s,box-shadow .12s,background-color .3s ease,color .2s ease;border:2px solid transparent;position:relative;user-select:none}
 .skill-cell:hover{transform:scale(1.15);box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:50}
 .skill-cell.gap-cell{border-color:#ef4444}
 .skill-cell.gap-cell::before{content:'!';position:absolute;top:-6px;right:-6px;width:13px;height:13px;background:#ef4444;color:#fff;border-radius:50%;font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center;z-index:10}
@@ -410,9 +410,70 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 /* Manager scope — hide admin-only elements */
 .is-manager .admin-only { display: none !important; }
+
+/* ── DARK MODE ── */
+body.dark {
+  --bg:#0f172a; --surface:#1e293b; --border:#334155;
+  --text:#f1f5f9; --muted:#94a3b8; --subtle:#475569;
+  --shadow:0 1px 3px rgba(0,0,0,.3),0 1px 2px rgba(0,0,0,.2);
+  --shadow-md:0 4px 16px rgba(0,0,0,.4);
+  --primary-light:#1e3a5f;
+}
+body.dark .fi,body.dark .fs,body.dark input,body.dark select,body.dark textarea{background:#1e293b;color:#f1f5f9;border-color:#334155}
+body.dark .modal{background:#1e293b}
+body.dark .overlay{background:rgba(0,0,0,.65)}
+body.dark .lv0{background:#1e293b!important;color:#94a3b8!important}
+body.dark .nav-item:hover{background:#334155}
+body.dark .nav-item.active{background:#1e3a5f}
+body.dark .topbar,body.dark .sidebar{background:#1e293b;border-color:#334155}
+body.dark .toast.success{background:#052e16;border-color:#166534;color:#86efac}
+body.dark .toast.warn{background:#1c1a05;border-color:#854d0e;color:#fde68a}
+body.dark .toast.error{background:#1c0505;border-color:#991b1b;color:#fca5a5}
+body.dark .toast.info{background:#0c1a3a;border-color:#1e40af;color:#93c5fd}
+body.dark .demo-panel{background:#1c1a05;border-color:#713f12}
+body.dark .add-form{background:#1e293b;border-color:#334155}
+body.dark details{background:#1e293b;border-color:#334155}
+
+/* ── DRAG WIDGETS ── */
+.stat-card[draggable]{cursor:grab}
+.stat-card[draggable]:active{cursor:grabbing}
+.stat-card.drag-over{outline:2px dashed var(--primary);outline-offset:2px;opacity:.7}
+.drag-handle{position:absolute;top:8px;right:8px;opacity:0;color:var(--subtle);cursor:grab;transition:opacity .15s;line-height:1}
+.stat-card:hover .drag-handle{opacity:1}
+
+/* ── MOBILE ── */
+.menu-btn{display:none}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199}
+.sidebar-overlay.show{display:block}
+@media(max-width:768px){
+  body{overflow:auto}
+  .sidebar{position:fixed;left:-240px;top:0;bottom:0;z-index:200;transition:left .25s ease}
+  .sidebar.open{left:0;box-shadow:4px 0 24px rgba(0,0,0,.18)}
+  .main{width:100vw;overflow:auto}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .content-area{padding:14px}
+  .topbar{padding:0 12px;gap:8px}
+  .search-box{width:150px}
+  .page-header{flex-wrap:wrap;gap:10px}
+  .people-grid,.roles-grid,.depts-grid{grid-template-columns:1fr}
+  .gap-grid{grid-template-columns:1fr}
+  .modal{width:95vw!important;max-height:90vh;overflow-y:auto}
+  .matrix-scroll{font-size:12px}
+  .add-form{flex-wrap:wrap}
+  .menu-btn{display:flex!important}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:1fr}
+  .search-box{width:120px}
+}
+
+@keyframes cellFlash{0%{transform:scale(1.28)}60%{transform:scale(.94)}100%{transform:scale(1)}}
+.cell-updated{animation:cellFlash .35s ease forwards}
 </style>
 </head>
 <body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <!-- TOOLTIP -->
 <div class="tt" id="tooltip"></div>
@@ -602,6 +663,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 
+<!-- SKILL EDIT MODAL -->
+<div class="overlay" id="skillModal">
+  <div class="modal" style="width:480px">
+    <div class="modal-hdr">
+      <div class="modal-title" id="skillModalTitle">Edit Skill</div>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+      <div class="ff"><label>Skill Name *</label><input class="fi" id="sm-name" placeholder="e.g. React"/></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="ff"><label>Category</label><select class="fs" id="sm-cat"></select></div>
+        <div class="ff"><label>Default Target</label>
+          <select class="fs" id="sm-req">
+            <option value="1">1 — Awareness</option><option value="2">2 — Novice</option>
+            <option value="3">3 — Intermediate</option><option value="4">4 — Advanced</option><option value="5">5 — Expert</option>
+          </select>
+        </div>
+      </div>
+      <div class="ff"><label>Description</label><input class="fi" id="sm-desc" placeholder="Brief description…"/></div>
+      <div class="ff"><label>Learning Resource</label><input class="fi" id="sm-resource" placeholder="https://… or course name"/></div>
+    </div>
+    <div class="modal-ftr" style="gap:10px">
+      <button class="btn btn-danger btn-sm admin-only" id="skillDeleteBtn" onclick="deleteSkillConfirm()">Delete Skill</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-secondary" onclick="closeSkillModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSkillEdit()">Save Skill</button>
+    </div>
+  </div>
+</div>
+
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-brand">
@@ -662,6 +752,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <!-- MAIN -->
 <main class="main">
   <header class="topbar">
+    <button class="icon-btn menu-btn" id="menuBtn" onclick="toggleSidebar()">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
     <div class="breadcrumb" id="breadcrumb"><span>Dashboard</span></div>
     <div class="topbar-spacer"></div>
     <div class="topbar-actions">
@@ -669,6 +762,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         <input type="text" id="searchInput" placeholder="Search people, skills…" oninput="applyFilters()">
       </div>
+      <button class="icon-btn" id="darkToggle" onclick="toggleDark()" title="Toggle dark mode">
+        <svg id="darkIcon" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
       <a href="user.html" class="topbar-link">
         <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         Employee View
@@ -797,6 +893,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
           </select>
         </div>
         <div class="ff"><label>Description</label><input class="fi" id="ns-desc" placeholder="Brief description…" style="width:220px"/></div>
+        <div class="ff"><label>Resource URL</label><input class="fi" id="ns-resource" placeholder="https://… or course name" style="width:200px"/></div>
         <button class="btn btn-primary admin-only" onclick="addSkill()">
           <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
           Add Skill
@@ -890,6 +987,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         <!-- Status indicator -->
         <div id="emailConfigStatus" style="margin-top:12px;padding:9px 13px;border-radius:8px;font-size:13px;display:none"></div>
       </div>
+      <div class="settings-block admin-only">
+        <h3>Skill Level Names</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Customise the label for each proficiency level (0–5)</p>
+        <div style="display:flex;flex-direction:column;gap:8px" id="levelLabelsForm"></div>
+        <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="saveLevelLabels()">Save Labels</button>
+      </div>
+      <div class="settings-block admin-only">
+        <h3>Audit Log</h3>
+        <div id="auditLogList" style="border:1px solid var(--border);border-radius:8px;max-height:360px;overflow-y:auto"></div>
+        <button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="clearAuditLog()">Clear Log</button>
+      </div>
       <div class="settings-block">
         <h3>Data</h3>
         <div class="setting-row"><div class="sr-info"><div class="sr-label">Reset to sample data</div><div class="sr-desc">Restore all demo data — cannot be undone</div></div><button class="btn btn-danger admin-only" onclick="resetData()">Reset Data</button></div>
@@ -961,7 +1069,8 @@ const DEF = {
     "5-6":true,"5-7":true,"5-12":true,
     "6-5":true,"6-6":true,"6-7":true,
   },
-  settings:{avgRow:true,gapIndicators:true,showInterest:true,selfAssess:true},
+  settings:{avgRow:true,gapIndicators:true,showInterest:true,selfAssess:true,levelLabels:{0:'Not Assessed',1:'Awareness',2:'Novice',3:'Intermediate',4:'Advanced',5:'Expert'}},
+  auditLog:[],
   nextMemberId:7,nextSkillId:15,nextRoleId:6,nextDeptId:4,currentUserId:3,
 };
 
@@ -973,6 +1082,9 @@ function loadData(){
   if(!D.nextRoleId) D.nextRoleId=D.roles.reduce((m,r)=>Math.max(m,r.id),0)+1;
   if(!D.nextDeptId) D.nextDeptId=D.departments.reduce((m,d)=>Math.max(m,d.id),0)+1;
   D.roles.forEach(r=>{if(!r.targets)r.targets={};});
+  if(!D.settings) D.settings={};
+  if(!D.settings.levelLabels) D.settings.levelLabels={0:'Not Assessed',1:'Awareness',2:'Novice',3:'Intermediate',4:'Advanced',5:'Expert'};
+  if(!D.auditLog) D.auditLog=[];
 }
 function saveData(){localStorage.setItem(SK,JSON.stringify(D));}
 function resetToDefault(){D=JSON.parse(JSON.stringify(DEF));saveData();}
@@ -996,6 +1108,10 @@ const LV={
   4:{label:"Advanced",color:"#16a34a",bg:"#dcfce7"},
   5:{label:"Expert",color:"#15803d",bg:"#bbf7d0"},
 };
+function getLevelLabel(n) {
+  return D?.settings?.levelLabels?.[n] ?? LV[n]?.label ?? String(n);
+}
+
 const CAT={
   "Frontend":{bg:"#dbeafe",text:"#1d4ed8",dot:"#2563eb"},
   "Backend":{bg:"#dcfce7",text:"#15803d",dot:"#16a34a"},
@@ -1004,7 +1120,13 @@ const CAT={
 };
 function getCatKey(cat){return cat.replace(/\s+/g,'');}
 function getLevel(mId,sId){return D.matrix[`${mId}-${sId}`]??0;}
-function setLevel(mId,sId,lv){D.matrix[`${mId}-${sId}`]=lv;saveData();}
+function setLevel(mId,sId,lv){
+  D.matrix[`${mId}-${sId}`]=lv;saveData();logAudit('skill_update',getMemberName(mId)+' · '+getSkillName(sId)+': → '+lv);
+  setTimeout(()=>{
+    const cell=document.querySelector(`[data-cell="${mId}-${sId}"]`);
+    if(cell){cell.classList.remove('cell-updated');void cell.offsetWidth;cell.classList.add('cell-updated');}
+  },30);
+}
 function getInterest(mId,sId){return !!D.interests[`${mId}-${sId}`];}
 function setInterest(mId,sId,v){if(v)D.interests[`${mId}-${sId}`]=true;else delete D.interests[`${mId}-${sId}`];saveData();}
 function getRoleTarget(m,sId){const r=D.roles.find(x=>x.id===m.roleId);return r?parseInt(r.targets[String(sId)]||0):0;}
@@ -1022,6 +1144,7 @@ let activeTab='dashboard',gapsOnly=false,editTarget=null,selLevel=null,selIntere
 const TITLES={dashboard:'Dashboard',people:'People',roles:'Roles',depts:'Departments',matrix:'Skills Matrix',library:'Skill Library',gaps:'Gap Analysis',reports:'Reports',settings:'Settings'};
 
 function navTo(tab,el){
+  closeSidebar();
   activeTab=tab;
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   if(el) el.classList.add('active');
@@ -1066,11 +1189,12 @@ function renderDashboard(){
   const avgLv=total?(totalLv/total).toFixed(1):'0.0';
   const totalInterests=Object.keys(D.interests).length;
 
+  const _dh='<span class="drag-handle" aria-hidden="true"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg></span>';
   document.getElementById('dashStats').innerHTML=`
-    <div class="stat-card"><div class="stat-icon" style="background:#eff6ff;color:#2563eb"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><div class="stat-value">${members.length}</div><div class="stat-label">Team Members</div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#f0fdf4;color:#16a34a"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div class="stat-value" style="color:#16a34a">${reqPct}%</div><div class="stat-label">Meeting Role Targets</div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#fef2f2;color:#dc2626"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="stat-value" style="color:#dc2626">${withGaps}</div><div class="stat-label">Members with Gaps</div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#eff6ff;color:#2563eb"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div><div class="stat-value">${totalInterests}</div><div class="stat-label">Interest Signals</div></div>
+    <div class="stat-card" draggable="true" data-widget="members">${_dh}<div class="stat-icon" style="background:#eff6ff;color:#2563eb"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><div class="stat-value">${members.length}</div><div class="stat-label">Team Members</div></div>
+    <div class="stat-card" draggable="true" data-widget="coverage">${_dh}<div class="stat-icon" style="background:#f0fdf4;color:#16a34a"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div class="stat-value" style="color:#16a34a">${reqPct}%</div><div class="stat-label">Meeting Role Targets</div></div>
+    <div class="stat-card" draggable="true" data-widget="gaps">${_dh}<div class="stat-icon" style="background:#fef2f2;color:#dc2626"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="stat-value" style="color:#dc2626">${withGaps}</div><div class="stat-label">Members with Gaps</div></div>
+    <div class="stat-card" draggable="true" data-widget="skills">${_dh}<div class="stat-icon" style="background:#eff6ff;color:#2563eb"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div><div class="stat-value">${totalInterests}</div><div class="stat-label">Interest Signals</div></div>
   `;
 
   // Category coverage
@@ -1100,6 +1224,7 @@ function renderDashboard(){
     return barRow(`${dept.name} (${dms.length})`,pct,`${pct}%`,dept.color,100);
   }).filter(Boolean).join('');
   document.getElementById('dashDeptChart').innerHTML=`<div class="chart-row">${deptBars}</div>`;
+  restoreDashOrder();initDashboardDrag();
 }
 
 function barRow(label,val,dispVal,color,max){
@@ -1492,6 +1617,7 @@ function saveRole(){
     showToast(`Role "${name}" created.`,'success');
   }
   saveData();
+  logAudit('role_save',(_editRoleId?'Updated':'Created')+' role: '+name);
   closeRoleModal();
   renderRoles();
 }
@@ -1591,6 +1717,7 @@ function saveEditMember(){
     }
   } catch(e){ console.warn('Could not update auth store:', e); }
   saveData();
+  logAudit('member_edit','Edited '+name);
   renderPeople();
   closeEditMember();
   showToast(`${name} updated successfully.`, 'success');
@@ -1612,6 +1739,7 @@ function deleteMember(id){
       localStorage.setItem('sbAuthData', JSON.stringify(auth));
     }
   } catch(e){ console.warn('Could not update auth store:', e); }
+  logAudit('member_delete','Deleted '+m.name);
   saveData();
   // Close edit modal if open
   document.getElementById('editMemberModal').classList.remove('open');
@@ -1736,6 +1864,7 @@ function saveDept(){
     showToast(`Department "${name}" created.`, 'success');
   }
   saveData();
+  logAudit('dept_save',(_editDeptId?'Updated':'Created')+' dept: '+name);
   renderDepts();
   closeDeptModal();
 }
@@ -1808,7 +1937,7 @@ function renderMatrix(){
       const lv=getLevel(m.id,s.id),tgt=getRoleTarget(m,s.id)||s.required;
       const isGap=tgt&&lv<tgt,hasInt=getInterest(m.id,s.id);
       const gapClass=(showGaps&&isGap)?'gap-cell':'';
-      html+=`<td class="td-cell"><div class="skill-cell lv${lv} ${gapClass}"
+      html+=`<td class="td-cell"><div class="skill-cell lv${lv} ${gapClass}" data-cell="${m.id}-${s.id}"
         onmouseenter="showTT(event,${m.id},${s.id})" onmouseleave="hideTT()"
         onclick="openModal(${m.id},${s.id})">${lv===0?'–':lv}${(showInt&&hasInt)?'<div class="int-dot"></div>':''}
       </div></td>`;
@@ -1921,10 +2050,17 @@ function renderLibrary(){
       <h3><span class="skill-cat-badge" style="background:${cc.bg};color:${cc.text}">${h(cat)}</span>${h(cat)} Skills</h3>
       <div class="skill-list">${catSkills.map(s=>{
         const dots=Array.from({length:5},(_,i)=>`<div class="req-dot${i<s.required?' on':''}"></div>`).join('');
+        const resourceHtml = s.resource
+          ? (s.resource.startsWith('http')
+              ? `<a href="${h(s.resource)}" target="_blank" rel="noopener" style="font-size:12px;color:var(--primary);display:inline-flex;align-items:center;gap:3px;margin-top:3px">📖 Learning resource</a>`
+              : `<span style="font-size:12px;color:var(--muted);margin-top:3px;display:block">📖 ${h(s.resource)}</span>`)
+          : '';
         return `<div class="skill-row">
-          <div style="flex:1"><div class="skill-name-text">${h(s.name)}</div>${s.description?`<div class="skill-desc">${h(s.description)}</div>`:''}</div>
+          <div style="flex:1"><div class="skill-name-text">${h(s.name)}</div>${s.description?`<div class="skill-desc">${h(s.description)}</div>`:''}${resourceHtml}</div>
           <div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;color:var(--muted)">Default target:</span><div class="req-dots">${dots}</div><span style="font-size:12px;font-weight:700;color:var(--primary)">${s.required}</span></div>
-          <button class="del-btn" onclick="deleteSkill(${s.id})">✕</button>
+          <button class="pc-action-btn admin-only" onclick="openEditSkill(${s.id})" title="Edit skill" style="margin-left:8px">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
         </div>`;
       }).join('')}</div>
     </div>`;
@@ -1935,9 +2071,10 @@ function addSkill(){
   const category=document.getElementById('ns-cat').value;
   const required=parseInt(document.getElementById('ns-req').value);
   const description=document.getElementById('ns-desc').value.trim();
+  const resource=document.getElementById('ns-resource')?.value.trim()||'';
   if(!name){alert('Enter a skill name.');return;}
-  D.skills.push({id:D.nextSkillId++,name,category,required,description});
-  saveData();document.getElementById('ns-name').value='';document.getElementById('ns-desc').value='';renderLibrary();
+  D.skills.push({id:D.nextSkillId++,name,category,required,description,resource});
+  saveData();document.getElementById('ns-name').value='';document.getElementById('ns-desc').value='';if(document.getElementById('ns-resource'))document.getElementById('ns-resource').value='';renderLibrary();
 }
 function deleteSkill(id){
   if(!confirm('Delete this skill?')) return;
@@ -1945,6 +2082,60 @@ function deleteSkill(id){
   Object.keys(D.matrix).forEach(k=>{if(k.endsWith(`-${id}`))delete D.matrix[k];});
   Object.keys(D.interests).forEach(k=>{if(k.endsWith(`-${id}`))delete D.interests[k];});
   saveData();renderLibrary();
+}
+
+// ── SKILL EDIT MODAL ──
+let _editSkillId = null;
+
+function openEditSkill(id) {
+  const s = D.skills.find(x => x.id === id);
+  if (!s) return;
+  _editSkillId = id;
+  document.getElementById('sm-name').value = s.name;
+  document.getElementById('sm-desc').value = s.description || '';
+  document.getElementById('sm-resource').value = s.resource || '';
+  document.getElementById('sm-req').value = s.required;
+  const cats = [...new Set([...D.skills.map(x=>x.category),'Frontend','Backend','DevOps','Soft Skills'])];
+  document.getElementById('sm-cat').innerHTML = cats.map(c=>`<option value="${h(c)}"${c===s.category?' selected':''}>${h(c)}</option>`).join('');
+  document.getElementById('skillModal').classList.add('open');
+  setTimeout(()=>document.getElementById('sm-name').focus(),100);
+}
+
+function closeSkillModal() {
+  document.getElementById('skillModal').classList.remove('open');
+  _editSkillId = null;
+}
+
+function saveSkillEdit() {
+  const name = document.getElementById('sm-name').value.trim();
+  if (!name) { alert('Please enter a skill name.'); return; }
+  const s = D.skills.find(x => x.id === _editSkillId);
+  if (!s) return;
+  s.name = name;
+  s.category = document.getElementById('sm-cat').value;
+  s.required = parseInt(document.getElementById('sm-req').value);
+  s.description = document.getElementById('sm-desc').value.trim();
+  s.resource = document.getElementById('sm-resource').value.trim();
+  logAudit('skill_edit', `Edited skill: ${name}`);
+  saveData();
+  closeSkillModal();
+  renderLibrary();
+  showToast(`Skill "${name}" updated.`, 'success');
+}
+
+function deleteSkillConfirm() {
+  const s = D.skills.find(x => x.id === _editSkillId);
+  if (!s) return;
+  if (!confirm(`Delete "${s.name}"? This removes all skill levels and targets for this skill.`)) return;
+  D.skills = D.skills.filter(x => x.id !== _editSkillId);
+  Object.keys(D.matrix).forEach(k=>{ if(k.endsWith(`-${_editSkillId}`)) delete D.matrix[k]; });
+  Object.keys(D.interests).forEach(k=>{ if(k.endsWith(`-${_editSkillId}`)) delete D.interests[k]; });
+  D.roles.forEach(r=>{ delete r.targets[_editSkillId]; });
+  logAudit('skill_delete', `Deleted skill: ${s.name}`);
+  saveData();
+  closeSkillModal();
+  renderLibrary();
+  showToast('Skill deleted.', 'warn');
 }
 
 // ═══════════════════════════════════════════════════
@@ -2148,6 +2339,7 @@ function openAddMember(){
 function closeAddMember(){ document.getElementById('addMemberModal').classList.remove('open'); }
 document.getElementById('addMemberModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeAddMember();});
 document.getElementById('roleModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeRoleModal();});
+document.getElementById('skillModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeSkillModal();});
 
 async function addMember(){
   const name   = document.getElementById('nm-name').value.trim();
@@ -2179,6 +2371,7 @@ async function addMember(){
   const newMemberId = D.nextMemberId++;
   D.members.push({ id:newMemberId, name, roleId, deptId, managerId: parseInt(document.getElementById('nm-managerId').value) || null, initials, color, email });
   saveData();
+  logAudit('member_add','Added '+name);
 
   // Add to auth system
   const AUTH_KEY = 'sbAuthData';
@@ -2239,6 +2432,26 @@ function renderSettings(){
   ['avgRow','gapIndicators','showInterest','selfAssess'].forEach(k=>{const el=document.getElementById(`s-${k}`);if(el)el.classList.toggle('on',!!D.settings[k]);});
   populateEmailConfigForm();
   updateEmailReadyBadge();
+  const labels = D.settings.levelLabels || {};
+  const llForm = document.getElementById('levelLabelsForm');
+  if (llForm) llForm.innerHTML = [0,1,2,3,4,5].map(n=>{
+    const def = LV[n]?.label||String(n);
+    return `<div style="display:flex;align-items:center;gap:10px">
+      <div style="width:28px;height:28px;border-radius:6px;background:${LV[n]?.bg||'#f1f5f9'};color:${LV[n]?.color||'#64748b'};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">${n}</div>
+      <input class="fi" style="flex:1" id="ll-${n}" value="${h(labels[n]||def)}" placeholder="${def}"/>
+    </div>`;
+  }).join('');
+  renderAuditLog();
+}
+
+function saveLevelLabels() {
+  if (!D.settings.levelLabels) D.settings.levelLabels = {};
+  [0,1,2,3,4,5].forEach(n=>{
+    const val = document.getElementById(`ll-${n}`)?.value.trim();
+    if (val) D.settings.levelLabels[n] = val;
+  });
+  saveData();
+  showToast('Level labels saved.', 'success');
 }
 function toggleSetting(k){D.settings[k]=!D.settings[k];saveData();renderSettings();}
 
@@ -2296,9 +2509,121 @@ function logout() {
 })();
 
 // ═══════════════════════════════════════════════════
+// AUDIT LOG
+// ═══════════════════════════════════════════════════
+function getMemberName(id) { return D.members.find(m=>m.id===id)?.name||`#${id}`; }
+function getSkillName(id) { return D.skills.find(s=>s.id===id)?.name||`#${id}`; }
+
+function logAudit(action, detail) {
+  const sess = getSession();
+  if (!D.auditLog) D.auditLog = [];
+  D.auditLog.unshift({ ts:Date.now(), by:sess?.name||'System', role:sess?.role||'', action, detail });
+  if (D.auditLog.length > 500) D.auditLog = D.auditLog.slice(0,500);
+  saveData();
+}
+
+function renderAuditLog() {
+  const el = document.getElementById('auditLogList');
+  if (!el) return;
+  if (!D.auditLog?.length) {
+    el.innerHTML='<div style="padding:16px;text-align:center;font-size:13px;color:var(--muted)">No activity recorded yet</div>';
+    return;
+  }
+  const icons={skill_update:'📊',member_add:'👤',member_edit:'✏️',member_delete:'🗑️',role_save:'💼',dept_save:'🏢',skill_edit:'⭐',skill_delete:'🗑️',default:'📝'};
+  el.innerHTML = D.auditLog.slice(0,100).map((e,i)=>{
+    const d=new Date(e.ts);
+    const dateStr=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+    const timeStr=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const icon=icons[e.action]||icons.default;
+    return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:${i%2===0?'var(--surface)':'var(--bg)'}">
+      <span style="font-size:16px;flex-shrink:0">${icon}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500;color:var(--text)">${h(e.detail)}</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:2px">by ${h(e.by)} · ${dateStr} ${timeStr}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function clearAuditLog() {
+  if (!confirm('Clear the audit log? This cannot be undone.')) return;
+  D.auditLog=[];
+  saveData();
+  renderAuditLog();
+  showToast('Audit log cleared.','warn');
+}
+
+// ── DARK MODE ──
+function toggleDark(){
+  const isDark=document.body.classList.toggle('dark');
+  localStorage.setItem('sbDark',isDark?'1':'0');
+  updateDarkIcon(isDark);
+}
+function updateDarkIcon(isDark){
+  const icon=document.getElementById('darkIcon');
+  if(!icon) return;
+  icon.innerHTML=isDark
+    ?'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+    :'<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+}
+function initDark(){
+  if(localStorage.getItem('sbDark')==='1'){document.body.classList.add('dark');updateDarkIcon(true);}
+}
+
+// ── DASHBOARD DRAG ──
+function initDashboardDrag(){
+  const grid=document.querySelector('.stats-grid');
+  if(!grid) return;
+  let dragSrc=null;
+  grid.querySelectorAll('.stat-card[draggable]').forEach(card=>{
+    card.addEventListener('dragstart',e=>{dragSrc=card;e.dataTransfer.effectAllowed='move';card.style.opacity='.45';});
+    card.addEventListener('dragend',()=>{card.style.opacity='';grid.querySelectorAll('.stat-card').forEach(c=>c.classList.remove('drag-over'));saveDashOrder();});
+    card.addEventListener('dragover',e=>{e.preventDefault();if(card!==dragSrc)card.classList.add('drag-over');});
+    card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));
+    card.addEventListener('drop',e=>{
+      e.preventDefault();
+      if(dragSrc&&dragSrc!==card){
+        const cards=[...grid.querySelectorAll('.stat-card')];
+        if(cards.indexOf(dragSrc)<cards.indexOf(card)) grid.insertBefore(dragSrc,card.nextSibling);
+        else grid.insertBefore(dragSrc,card);
+      }
+      card.classList.remove('drag-over');
+    });
+  });
+}
+function saveDashOrder(){
+  const grid=document.querySelector('.stats-grid');
+  if(!grid) return;
+  const order=[...grid.querySelectorAll('.stat-card')].map(c=>c.dataset.widget).filter(Boolean);
+  if(order.length) localStorage.setItem('sbDashOrder',JSON.stringify(order));
+}
+function restoreDashOrder(){
+  try{
+    const order=JSON.parse(localStorage.getItem('sbDashOrder')||'null');
+    if(!order?.length) return;
+    const grid=document.querySelector('.stats-grid');
+    if(!grid) return;
+    order.forEach(id=>{const c=grid.querySelector(`[data-widget="${id}"]`);if(c)grid.appendChild(c);});
+  }catch{}
+}
+
+// ── MOBILE SIDEBAR ──
+function toggleSidebar(){
+  const sb=document.querySelector('.sidebar');
+  const ov=document.getElementById('sidebarOverlay');
+  const open=sb.classList.toggle('open');
+  ov.classList.toggle('show',open);
+}
+function closeSidebar(){
+  document.querySelector('.sidebar')?.classList.remove('open');
+  document.getElementById('sidebarOverlay')?.classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════
 loadData();
+initDark();
 renderDashboard();
 renderSettings();
 </script>
