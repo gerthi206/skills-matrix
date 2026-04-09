@@ -2414,12 +2414,10 @@ async function addMember(){
   closeAddMember();
   renderPeople();
 
-  // Show result toast
-  if(emailResult.sent){
+  // Show result
   if(emailResult.sent){
     showToast(`✓ ${name} added — invitation sent to ${email}`, 'success');
   } else {
-    // Email not sent — show persistent password dialog so admin can't miss it
     showPasswordAlert(name, email, tempPassword, false);
   }
 }
