@@ -421,6 +421,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 
+<!-- ADD / EDIT ROLE MODAL -->
+<div class="overlay" id="roleModal">
+  <div class="modal" style="width:560px;max-height:90vh;display:flex;flex-direction:column">
+    <div class="modal-hdr">
+      <div class="modal-title" id="roleModalTitle">Add Role</div>
+      <div class="modal-sub" id="roleModalSub">Define skill targets for this role</div>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;overflow-y:auto;flex:1">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="ff"><label>Role Name *</label><input class="fi" id="rm-name" placeholder="e.g. Data Engineer"/></div>
+        <div class="ff"><label>Department</label>
+          <select class="fs" id="rm-deptId"><option value="">No department</option></select>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">Skill Targets <span style="font-weight:400;color:var(--muted);font-size:12px">— set the required level for each skill (0 = not required)</span></div>
+        <div id="rm-skillList" style="display:flex;flex-direction:column;gap:4px"></div>
+      </div>
+    </div>
+    <div class="modal-ftr" style="gap:10px">
+      <button class="btn btn-danger btn-sm" id="roleDeleteBtn" onclick="deleteRole()" style="display:none">Delete Role</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-secondary" onclick="closeRoleModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRole()">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Role
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ADD MEMBER MODAL -->
 <div class="overlay" id="addMemberModal">
   <div class="modal" style="width:500px">
@@ -584,6 +615,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <div class="tab-panel" id="tab-roles">
       <div class="page-header">
         <div class="page-header-text"><h2>Roles</h2><p>Define skill targets for each role in your organisation</p></div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary" onclick="openAddRole()">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Add Role
+          </button>
+        </div>
       </div>
       <div class="roles-grid" id="rolesGrid"></div>
     </div>
@@ -808,11 +845,17 @@ const DEF = {
     "6-5":true,"6-6":true,"6-7":true,
   },
   settings:{avgRow:true,gapIndicators:true,showInterest:true,selfAssess:true},
-  nextMemberId:7,nextSkillId:15,currentUserId:3,
+  nextMemberId:7,nextSkillId:15,nextRoleId:6,currentUserId:3,
 };
 
 let D=null;
-function loadData(){try{const s=localStorage.getItem(SK);D=s?JSON.parse(s):null;}catch(e){D=null;}if(!D)resetToDefault();}
+function loadData(){
+  try{const s=localStorage.getItem(SK);D=s?JSON.parse(s):null;}catch(e){D=null;}
+  if(!D){resetToDefault();return;}
+  // Migrations
+  if(!D.nextRoleId) D.nextRoleId=D.roles.reduce((m,r)=>Math.max(m,r.id),0)+1;
+  D.roles.forEach(r=>{if(!r.targets)r.targets={};});
+}
 function saveData(){localStorage.setItem(SK,JSON.stringify(D));}
 function resetToDefault(){D=JSON.parse(JSON.stringify(DEF));saveData();}
 function resetData(){if(confirm('Reset all data to sample defaults?')){resetToDefault();location.reload();}}
@@ -1184,31 +1227,154 @@ function backToPeople(){
 // ROLES
 // ═══════════════════════════════════════════════════
 function renderRoles(){
-  document.getElementById('rolesGrid').innerHTML=D.roles.map(role=>{
+  const grid = document.getElementById('rolesGrid');
+  if(!D.roles.length){
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)">
+      <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 12px;display:block;opacity:.4"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+      <div style="font-weight:600;margin-bottom:4px">No roles defined</div>
+      <div style="font-size:13px">Click <strong>Add Role</strong> to create your first role</div>
+    </div>`;
+    return;
+  }
+  grid.innerHTML=D.roles.map(role=>{
     const dept=D.departments.find(d=>d.id===role.deptId);
     const members=D.members.filter(m=>m.roleId===role.id);
-    const tgtKeys=Object.keys(role.targets);
+    const tgtKeys=Object.keys(role.targets).filter(k=>parseInt(role.targets[k])>0);
     const deptColor=dept?.color||'#64748b';
-    return `<div class="role-card">
+    return `<div class="role-card" onclick="openEditRole(${role.id})" style="cursor:pointer;transition:box-shadow .15s,transform .15s" onmouseenter="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)';this.style.transform='translateY(-1px)'" onmouseleave="this.style.boxShadow='';this.style.transform=''">
       <div class="rc-header">
         <div class="rc-icon" style="background:${deptColor}18;color:${deptColor}"><svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></div>
-        <div>
+        <div style="flex:1;min-width:0">
           <div class="rc-name">${h(role.name)}</div>
-          <div class="rc-dept">${h(dept?.name||'')}</div>
-          <div class="rc-members">${members.length} member${members.length!==1?'s':''}</div>
+          <div class="rc-dept">${h(dept?.name||'No department')}</div>
+          <div class="rc-members">${members.length} member${members.length!==1?'s':''} · ${tgtKeys.length} skill target${tgtKeys.length!==1?'s':''}</div>
         </div>
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--subtle);flex-shrink:0"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       </div>
       <div class="rc-skills">
-        ${tgtKeys.map(sId=>{
-          const s=D.skills.find(x=>x.id===parseInt(sId));
-          if(!s) return '';
-          const req=parseInt(role.targets[sId]);
-          const info=LV[req]||LV[0];
-          return `<div class="rc-skill-row"><div class="rc-skill-name">${h(s.name)}</div><span class="rc-skill-req" style="background:${info.bg};color:${info.color}">${req}</span></div>`;
+        ${tgtKeys.length===0
+          ? `<div style="font-size:12px;color:var(--subtle);font-style:italic">No skill targets set — click to configure</div>`
+          : tgtKeys.slice(0,6).map(sId=>{
+              const s=D.skills.find(x=>x.id===parseInt(sId));
+              if(!s) return '';
+              const req=parseInt(role.targets[sId]);
+              const info=LV[req]||LV[0];
+              return `<div class="rc-skill-row"><div class="rc-skill-name">${h(s.name)}</div><span class="rc-skill-req" style="background:${info.bg};color:${info.color}">${req}</span></div>`;
+            }).join('')+(tgtKeys.length>6?`<div style="font-size:12px;color:var(--muted);margin-top:4px">+${tgtKeys.length-6} more…</div>`:'')
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── ROLE MODAL STATE ──
+let _editRoleId = null;
+
+function _populateRoleModal(){
+  // Departments dropdown
+  document.getElementById('rm-deptId').innerHTML=
+    '<option value="">No department</option>'+
+    D.departments.map(d=>`<option value="${d.id}">${h(d.name)}</option>`).join('');
+
+  // Skill list grouped by category
+  const cats=[...new Set(D.skills.map(s=>s.category))];
+  const role=_editRoleId!==null ? D.roles.find(r=>r.id===_editRoleId) : null;
+  const targets=role?.targets||{};
+
+  document.getElementById('rm-skillList').innerHTML=cats.map(cat=>{
+    const catSkills=D.skills.filter(s=>s.category===cat);
+    const cc=CAT[cat]||{bg:'#f1f5f9',color:'#475569',dot:'#64748b'};
+    return `<div style="margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:${cc.color};background:${cc.bg};padding:4px 10px;border-radius:6px;margin-bottom:6px;display:inline-block">${h(cat)}</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        ${catSkills.map(s=>{
+          const cur=parseInt(targets[s.id]||0);
+          return `<div style="display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:7px;background:#f8fafc;border:1px solid var(--border)">
+            <div style="flex:1;font-size:13px;font-weight:500">${h(s.name)}</div>
+            <div style="font-size:11px;color:var(--muted);margin-right:4px">Default: ${s.required}</div>
+            <select class="fs" id="rt-${s.id}" style="width:150px;font-size:12.5px">
+              <option value="0"${cur===0?' selected':''}>0 — Not Required</option>
+              <option value="1"${cur===1?' selected':''}>1 — Awareness</option>
+              <option value="2"${cur===2?' selected':''}>2 — Novice</option>
+              <option value="3"${cur===3?' selected':''}>3 — Intermediate</option>
+              <option value="4"${cur===4?' selected':''}>4 — Advanced</option>
+              <option value="5"${cur===5?' selected':''}>5 — Expert</option>
+            </select>
+          </div>`;
         }).join('')}
       </div>
     </div>`;
   }).join('');
+}
+
+function openAddRole(){
+  _editRoleId=null;
+  document.getElementById('roleModalTitle').textContent='Add Role';
+  document.getElementById('roleModalSub').textContent='Define skill targets for this role';
+  document.getElementById('rm-name').value='';
+  document.getElementById('roleDeleteBtn').style.display='none';
+  _populateRoleModal();
+  document.getElementById('rm-deptId').value='';
+  document.getElementById('roleModal').classList.add('open');
+  setTimeout(()=>document.getElementById('rm-name').focus(),100);
+}
+
+function openEditRole(id){
+  const role=D.roles.find(r=>r.id===id);
+  if(!role) return;
+  _editRoleId=id;
+  document.getElementById('roleModalTitle').textContent='Edit Role';
+  document.getElementById('roleModalSub').textContent=`${Object.keys(role.targets).filter(k=>parseInt(role.targets[k])>0).length} skill targets configured`;
+  document.getElementById('rm-name').value=role.name;
+  document.getElementById('roleDeleteBtn').style.display='';
+  _populateRoleModal();
+  document.getElementById('rm-deptId').value=role.deptId||'';
+  document.getElementById('roleModal').classList.add('open');
+}
+
+function closeRoleModal(){
+  document.getElementById('roleModal').classList.remove('open');
+}
+
+function saveRole(){
+  const name=document.getElementById('rm-name').value.trim();
+  if(!name){alert('Please enter a role name.');return;}
+  const deptId=parseInt(document.getElementById('rm-deptId').value)||null;
+
+  // Collect targets — only include levels > 0
+  const targets={};
+  D.skills.forEach(s=>{
+    const val=parseInt(document.getElementById(`rt-${s.id}`)?.value||0);
+    if(val>0) targets[s.id]=val;
+  });
+
+  if(_editRoleId!==null){
+    const role=D.roles.find(r=>r.id===_editRoleId);
+    if(role){role.name=name;role.deptId=deptId;role.targets=targets;}
+    showToast(`Role "${name}" updated.`,'success');
+  } else {
+    if(!D.nextRoleId) D.nextRoleId=D.roles.reduce((m,r)=>Math.max(m,r.id),0)+1;
+    D.roles.push({id:D.nextRoleId++,name,deptId,targets});
+    showToast(`Role "${name}" created.`,'success');
+  }
+  saveData();
+  closeRoleModal();
+  renderRoles();
+}
+
+function deleteRole(){
+  const role=D.roles.find(r=>r.id===_editRoleId);
+  if(!role) return;
+  const memberCount=D.members.filter(m=>m.roleId===role.id).length;
+  const warn=memberCount>0?`\n\n⚠ ${memberCount} member${memberCount!==1?'s are':' is'} assigned to this role — they will be unassigned.`:'';
+  if(!confirm(`Delete the role "${role.name}"?${warn}`)) return;
+  // Unassign members
+  D.members.forEach(m=>{if(m.roleId===role.id)m.roleId=null;});
+  D.roles=D.roles.filter(r=>r.id!==_editRoleId);
+  saveData();
+  closeRoleModal();
+  renderRoles();
+  showToast(`Role "${role.name}" deleted.`,'warn');
 }
 
 // ═══════════════════════════════════════════════════
@@ -1594,6 +1760,7 @@ function openAddMember(){
 }
 function closeAddMember(){ document.getElementById('addMemberModal').classList.remove('open'); }
 document.getElementById('addMemberModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeAddMember();});
+document.getElementById('roleModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeRoleModal();});
 
 async function addMember(){
   const name   = document.getElementById('nm-name').value.trim();
