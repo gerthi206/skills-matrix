@@ -2237,15 +2237,17 @@ function saveEmailConfig(){
 function populateEmailConfigForm(){
   const cfg = loadEmailConfig();
   if(!cfg) return;
-  document.getElementById('ejs-pubkey').value  = cfg.publicKey  || '';
-  document.getElementById('ejs-service').value  = cfg.serviceId  || '';
-  document.getElementById('ejs-template').value = cfg.templateId || '';
-  document.getElementById('ejs-sender').value   = cfg.senderName || '';
-  document.getElementById('ejs-url').value      = cfg.loginUrl   || '';
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.value = val || ''; };
+  set('ejs-pubkey',   cfg.publicKey);
+  set('ejs-service',  cfg.serviceId);
+  set('ejs-template', cfg.templateId);
+  set('ejs-sender',   cfg.senderName);
+  set('ejs-url',      cfg.loginUrl);
 }
 
 function showEmailStatus(type, msg){
   const el = document.getElementById('emailConfigStatus');
+  if(!el) return;
   el.style.display = 'block';
   if(type === 'success'){
     el.style.background='#f0fdf4'; el.style.border='1px solid #86efac'; el.style.color='#166534';
