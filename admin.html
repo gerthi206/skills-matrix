@@ -1700,6 +1700,7 @@ function saveEditMember(){
   const roleId = parseInt(document.getElementById('em-roleId').value)||null;
   const deptId = parseInt(document.getElementById('em-deptId').value)||null;
   const initials = name.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase();
+  const prevEmail = m.email; // capture before overwrite for auth lookup
   m.name = name; m.email = email; m.roleId = roleId; m.deptId = deptId;
   m.initials = initials; m.color = _editMemberColor;
   m.managerId = parseInt(document.getElementById('em-managerId').value) || null;
@@ -1708,11 +1709,23 @@ function saveEditMember(){
     const newRole = document.getElementById('em-accountRole').value;
     const auth = JSON.parse(localStorage.getItem('sbAuthData')||'null');
     if(auth && auth.users){
-      const u = auth.users.find(x=>x.memberId===_editMemberId || x.email===m.email);
-      if(u){ u.name = name; u.email = email; }
-      const idx = auth.users.findIndex(u => u.memberId === m.id);
-      if (idx >= 0 && newRole) auth.users[idx].role = newRole;
-      else if (idx >= 0 && !newRole) {} // leave role unchanged if blank selected
+      // Find by memberId (most reliable). Email fallback uses OLD email (before m.email was updated).
+      let idx = auth.users.findIndex(x => x.memberId === _editMemberId);
+      if(idx < 0) idx = auth.users.findIndex(x => x.email === prevEmail);
+      if(idx >= 0){
+        auth.users[idx].name = name;
+        auth.users[idx].email = email;
+        auth.users[idx].memberId = _editMemberId; // repair if missing
+        if(newRole){
+          auth.users[idx].role = newRole;
+        } else {
+          // "No Login Access" — remove the account entry
+          auth.users.splice(idx, 1);
+        }
+      } else if(newRole){
+        // No auth entry yet — role can only be assigned after Reset Password grants initial access
+        showToast('Account access role saved. Use "Reset Password" to grant login credentials.','info',5000);
+      }
       localStorage.setItem('sbAuthData', JSON.stringify(auth));
     }
   } catch(e){ console.warn('Could not update auth store:', e); }
